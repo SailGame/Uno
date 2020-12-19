@@ -6,7 +6,7 @@ void EventLoop::StartLoop()
 {
     while (true) {
         if (!mEventQueue.empty()) {
-            mEventQueue.front()->Process();
+            mStateMachine->Transition(mEventQueue.front());
             mEventQueue.pop();
         }
     }

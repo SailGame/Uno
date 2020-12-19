@@ -2,8 +2,9 @@
 
 namespace SailGame { namespace Common {
 
-void Event::Process()
+void UserInputEvent::Process(std::shared_ptr<Game::State> &state)
 {
-    std::cout << mId << std::endl;
+    std::cout << mCharInputted << std::endl;
 }
+
 }}
