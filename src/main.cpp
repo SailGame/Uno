@@ -11,10 +11,10 @@ int main(int argc, char** argv) {
     auto eventLoop = std::make_shared<Common::EventLoop>();
 
     std::thread t([&eventLoop] {
-        auto id = 0;
+        auto id = ' ';
         while (true) {
             std::cin >> id;
-            eventLoop->AppendEvent(std::make_shared<Common::Event>(id));
+            eventLoop->AppendEvent(std::make_shared<Common::UserInputEvent>(id));
         }
     });
 

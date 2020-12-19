@@ -3,13 +3,16 @@
 #include <memory>
 #include <queue>
 
-#include "event.h"
+#include "state_machine.h"
 
 namespace SailGame { namespace Common {
 
 class EventLoop {
 public:
-    EventLoop() = default;
+    EventLoop() {
+        /// XXX: use factory
+        mStateMachine = std::make_shared<StateMachine>();
+    }
 
     void StartLoop();
 
@@ -17,5 +20,6 @@ public:
 
 private:
     std::queue<std::shared_ptr<Event>> mEventQueue;
+    std::shared_ptr<StateMachine> mStateMachine;
 };
 }}
