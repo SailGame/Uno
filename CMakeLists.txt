@@ -59,9 +59,9 @@ add_custom_command(
 # Include generated *.pb.h files
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-foreach(_target hello_client hello_server)
-    add_executable(${_target} 
-        "${_target}.cc" ${proto_srcs} ${grpc_srcs})
-    target_link_libraries(${_target}
-        ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
-endforeach()
+# a mock server
+add_executable(hello_server hello_server.cc ${proto_srcs} ${grpc_srcs})
+target_link_libraries(hello_server ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
+
+# uno
+add_subdirectory(src)
