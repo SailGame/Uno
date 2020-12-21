@@ -32,9 +32,27 @@ std::shared_ptr<NetworkEvent> NetworkEvent::Create(const NotifyMsg &msg)
     return nullptr;
 }
 
+std::shared_ptr<UserInputEvent> UserInputEvent::Create(char ch)
+{
+    switch (ch) {
+        case ',':  return std::make_shared<CursorMoveLeftUserInputEvent>();
+        case '.':  return std::make_shared<CursorMoveRightUserInputEvent>();
+#if defined(__unix__) || defined(__APPLE__)
+        case '\n': return std::make_shared<PlayUserInputEvent>();
+#elif defined(_WIN32)
+        case '\r': return std::make_shared<PlayUserInputEvent>();
+#endif
+        case ' ':  return std::make_shared<PassUserInputEvent>();
+        case 'q': case 'Q': return std::make_shared<QuitUserInputEvent>();
+        default: return std::make_shared<UserInputEvent>();
+    }
+    assert(false);
+    return nullptr;
+}
+
 void UserInputEvent::Process(std::shared_ptr<State> &state)
 {
-    std::cout << mCharInputted << std::endl;
+    // default handler for UserInputEvent, do nothing
 }
 
 void TimerEvent::Process(std::shared_ptr<State> &state)
@@ -98,6 +116,28 @@ void DoubtNetworkEvent::Process(std::shared_ptr<State> &state)
 
 void DoubtRspNetworkEvent::Process(std::shared_ptr<State> &state)
 {
+}
+
+// -------------------- UserInputEvent ---------------------
+void CursorMoveLeftUserInputEvent::Process(std::shared_ptr<State> &state)
+{
+    
+}
+
+void CursorMoveRightUserInputEvent::Process(std::shared_ptr<State> &state)
+{    
+}
+
+void PlayUserInputEvent::Process(std::shared_ptr<State> &state)
+{    
+}
+
+void PassUserInputEvent::Process(std::shared_ptr<State> &state)
+{    
+}
+
+void QuitUserInputEvent::Process(std::shared_ptr<State> &state)
+{    
 }
 
 }}

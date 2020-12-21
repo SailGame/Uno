@@ -27,8 +27,8 @@ void GameState::UpdateAfterSkip()
 void GameState::NextPlayer()
 {
     mCurrentPlayer = mIsInClockwise ? 
-        Util::WrapWithPlayerNum(mCurrentPlayer + 1) :
-        Util::WrapWithPlayerNum(mCurrentPlayer - 1);
+        Util::Wrap(mCurrentPlayer + 1, Config::mPlayerNum) :
+        Util::Wrap(mCurrentPlayer - 1, Config::mPlayerNum);
     mTimeElapsed = 0;
 }
 

@@ -5,6 +5,7 @@
 #include <memory>
 #include <thread>
 
+#include "util.h"
 #include "../game/event.h"
 #include "../network/client.h"
 

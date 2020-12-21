@@ -32,12 +32,11 @@ public:
 
 class UserInputEvent : public Event {
 public:
-    UserInputEvent(char c) : mCharInputted(c) {}
+    static std::shared_ptr<UserInputEvent> Create(char ch);
+
+    UserInputEvent() = default;
 
     virtual void Process(std::shared_ptr<State> &state) override;
-
-private:
-    char mCharInputted;
 };
 
 class TimerEvent : public Event {
@@ -126,6 +125,42 @@ public:
 
 private:
     DoubtRsp mDoubtRsp;
+};
+
+// -------------------- UserInputEvent ---------------------
+class CursorMoveLeftUserInputEvent : public UserInputEvent {
+public:
+    CursorMoveLeftUserInputEvent() = default;
+
+    virtual void Process(std::shared_ptr<State> &state) override;
+};
+
+class CursorMoveRightUserInputEvent : public UserInputEvent {
+public:
+    CursorMoveRightUserInputEvent() = default;
+
+    virtual void Process(std::shared_ptr<State> &state) override;
+};
+
+class PlayUserInputEvent : public UserInputEvent {
+public:
+    PlayUserInputEvent() = default;
+
+    virtual void Process(std::shared_ptr<State> &state) override;
+};
+
+class PassUserInputEvent : public UserInputEvent {
+public:
+    PassUserInputEvent() = default;
+
+    virtual void Process(std::shared_ptr<State> &state) override;
+};
+
+class QuitUserInputEvent : public UserInputEvent {
+public:
+    QuitUserInputEvent() = default;
+
+    virtual void Process(std::shared_ptr<State> &state) override;
 };
 
 }}
