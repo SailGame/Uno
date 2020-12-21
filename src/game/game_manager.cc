@@ -12,7 +12,6 @@ GameManager::GameManager()
     mUIManager(std::make_unique<UIManager>())
 {
     auto callback = [this](const std::shared_ptr<Event> &event) {
-        std::cout << "event happens" << std::endl;
         mEventLoop->AppendEvent(event);
     };
 

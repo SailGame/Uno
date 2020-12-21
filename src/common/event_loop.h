@@ -26,5 +26,6 @@ private:
 
 private:
     std::queue<std::shared_ptr<Event>> mEventQueue;
+    std::mutex mMutex;
 };
 }}
