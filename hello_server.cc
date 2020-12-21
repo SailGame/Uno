@@ -38,23 +38,26 @@ using grpc::ServerReader;
 using grpc::ServerReaderWriter;
 using grpc::ServerWriter;
 using grpc::Status;
-using SailGame::IntWrapper;
-using SailGame::Hello;
 using std::chrono::system_clock;
+using Uno::UserOperation;
+using Uno::NotifyMsg;
+using Uno::UnoService;
 
-class HelloImpl final : public Hello::Service {
+class HelloImpl final : public UnoService::Service {
  public:
   explicit HelloImpl() {}
 
   Status BiStream(ServerContext* context,
-                   ServerReaderWriter<IntWrapper, IntWrapper>* stream) override {
+                   ServerReaderWriter<NotifyMsg, UserOperation>* stream) override {
     while (true) {
-      int c = 0;
-      std::cin >> c;
-      std::cout << c << std::endl;
-      IntWrapper intWrapper;
-      intWrapper.set_payload(c);
-      stream->Write(intWrapper);
+      int userid = 0;
+      int number = 0;
+      std::cin >> userid >> number;
+      Uno::NotifyMsg msg;
+      Uno::Draw *draw = msg.mutable_draw();
+      draw->set_userid(userid);
+      draw->set_number(number);
+      stream->Write(msg);
     }
 
     return Status::OK;
