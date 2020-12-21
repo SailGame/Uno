@@ -16,7 +16,7 @@ GameManager::GameManager()
         mEventLoop->AppendEvent(event);
     };
 
-    mNetworkThread = std::make_unique<std::thread>(NetworkEventListener{callback});
+    mNetworkThread = std::make_unique<std::thread>(NetworkEventListener{callback, "localhost:50051"});
     mUserInputThread = std::make_unique<std::thread>(UserInputEventListener{callback});
     mTimerThread = std::make_unique<std::thread>(TimerEventListener{callback});
 }

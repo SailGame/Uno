@@ -5,10 +5,12 @@
 #include <memory>
 
 #include "../game/event.h"
+#include "../network/client.h"
 
 namespace SailGame { namespace Common {
 
 using Game::Event;
+using Network::Client;
 
 class EventListener {
 public:
@@ -21,10 +23,14 @@ protected:
 
 class NetworkEventListener : public EventListener {
 public:
-    NetworkEventListener(const std::function<void(const std::shared_ptr<Event> &)> &callback)
-        : EventListener(callback) {}
+    NetworkEventListener(const std::function<void(const std::shared_ptr<Event> &)> &callback,
+        const std::string &serverAddr)
+        : EventListener(callback), mClient(std::make_unique<Client>(serverAddr)) {}
     
     void operator()();
+
+private:
+    std::unique_ptr<Client> mClient;
 };
 
 class UserInputEventListener : public EventListener {
