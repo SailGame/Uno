@@ -14,6 +14,8 @@ void EventLoop::StartLoop()
 
 void EventLoop::AppendEvent(const std::shared_ptr<Event> &event)
 {
+    // three threads may invoke this at the same time
+    std::lock_guard<std::mutex> lock(mMutex);
     mEventQueue.push(event);
 }
 
