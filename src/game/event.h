@@ -8,8 +8,15 @@
 
 namespace SailGame { namespace Game {
 
-using Uno::NotifyMsg;
-using Uno::Draw;
+using ::Uno::NotifyMsg;
+using ::Uno::Draw;
+using ::Uno::Skip;
+using ::Uno::Play;
+using ::Uno::DrawRsp;
+using ::Uno::Uno;
+using ::Uno::Catch;
+using ::Uno::Doubt;
+using ::Uno::DoubtRsp;
 
 class Event {
 public:
@@ -40,6 +47,7 @@ public:
     virtual void Process(std::shared_ptr<State> &state) override;
 };
 
+// -------------------- NetworkEvent ---------------------
 class DrawNetworkEvent : public NetworkEvent {
 public:
     DrawNetworkEvent(const Draw &draw) : mDraw(draw) {}
@@ -49,4 +57,75 @@ public:
 private:
     Draw mDraw;
 };
+
+class SkipNetworkEvent : public NetworkEvent {
+public:
+    SkipNetworkEvent(const Skip &skip) : mSkip(skip) {}
+
+    virtual void Process(std::shared_ptr<State> &state) override;
+
+private:
+    Skip mSkip;
+};
+
+class PlayNetworkEvent : public NetworkEvent {
+public:
+    PlayNetworkEvent(const Play &play) : mPlay(play) {}
+
+    virtual void Process(std::shared_ptr<State> &state) override;
+
+private:
+    Play mPlay;
+};
+
+class DrawRspNetworkEvent : public NetworkEvent {
+public:
+    DrawRspNetworkEvent(const DrawRsp &drawRsp) : mDrawRsp(drawRsp) {}
+
+    virtual void Process(std::shared_ptr<State> &state) override;
+
+private:
+    DrawRsp mDrawRsp;
+};
+
+class UnoNetworkEvent : public NetworkEvent {
+public:
+    UnoNetworkEvent(const Uno &uno) : mUno(uno) {}
+
+    virtual void Process(std::shared_ptr<State> &state) override;
+
+private:
+    Uno mUno;
+};
+
+class CatchNetworkEvent : public NetworkEvent {
+public:
+    CatchNetworkEvent(const Catch &catch_) : mCatch(catch_) {}
+
+    virtual void Process(std::shared_ptr<State> &state) override;
+
+private:
+    Catch mCatch;
+};
+
+class DoubtNetworkEvent : public NetworkEvent {
+public:
+    DoubtNetworkEvent(const Doubt &doubt) : mDoubt(doubt) {}
+
+    virtual void Process(std::shared_ptr<State> &state) override;
+
+private:
+    Doubt mDoubt;
+};
+
+class DoubtRspNetworkEvent : public NetworkEvent {
+public:
+    DoubtRspNetworkEvent(const DoubtRsp &doubtRsp) : mDoubtRsp(doubtRsp) {}
+
+    virtual void Process(std::shared_ptr<State> &state) override;
+
+private:
+    DoubtRsp mDoubtRsp;
+};
+
 }}
