@@ -47,6 +47,7 @@ set(proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/hello.pb.cc")
 set(proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/hello.pb.h")
 set(grpc_srcs "${CMAKE_CURRENT_BINARY_DIR}/hello.grpc.pb.cc")
 set(grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/hello.grpc.pb.h")
+
 add_custom_command(
     OUTPUT "${proto_srcs}" "${proto_hdrs}" "${grpc_srcs}" "${grpc_hdrs}"
     COMMAND ${_PROTOBUF_PROTOC}
@@ -58,12 +59,15 @@ add_custom_command(
     DEPENDS "${proto_path}"# "${_PROTOBUF_PROTOC}" "${_GRPC_CPP_PLUGIN_EXECUTABLE}"
 )
 
+add_library(hello_proto_lib ${proto_srcs} ${grpc_srcs})
+target_link_libraries(hello_proto_lib ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
+
 # Include generated *.pb.h files
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 # a mock server
-add_executable(hello_server hello_server.cc ${proto_srcs} ${grpc_srcs})
-target_link_libraries(hello_server ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
+add_executable(hello_server hello_server.cc)
+target_link_libraries(hello_server hello_proto_lib)
 
 # uno
 add_subdirectory(src)
