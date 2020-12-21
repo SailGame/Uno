@@ -1,10 +1,12 @@
 #pragma once
 
 #include "card.h"
-#include "util.h"
 #include "config.h"
+#include "../common/util.h"
 
 namespace SailGame { namespace Game {
+
+using Common::Util;
 
 class GameState {
 public:

@@ -6,5 +6,6 @@ class Config {
 public:
     static int mPlayerNum;
     static int mMyUserId;
+    static int mSecondsPerTurn;
 };
 }}

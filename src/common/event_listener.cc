@@ -16,10 +16,9 @@ void NetworkEventListener::operator()()
 
 void UserInputEventListener::operator()()
 {
-    auto id = ' ';
     while (true) {
-        std::cin >> id;
-        OnEventHappens(std::make_shared<UserInputEvent>(id));
+        auto ch = Util::GetCharImmediately();
+        OnEventHappens(UserInputEvent::Create(ch));
     }
 }
 
