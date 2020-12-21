@@ -34,6 +34,10 @@ private:
 };
 
 class TimerEvent : public Event {
+public:
+    TimerEvent() = default;
+
+    virtual void Process(std::shared_ptr<State> &state) override;
 };
 
 class DrawNetworkEvent : public NetworkEvent {
