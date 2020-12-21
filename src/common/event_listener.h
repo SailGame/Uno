@@ -4,9 +4,11 @@
 #include <iostream>
 #include <memory>
 
-#include "event.h"
+#include "../game/event.h"
 
-namespace SailGame { namespace Game {
+namespace SailGame { namespace Common {
+
+using Game::Event;
 
 class EventListener {
 public:
