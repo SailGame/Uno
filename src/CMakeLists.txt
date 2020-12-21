@@ -3,10 +3,10 @@ aux_source_directory(. APP_DIR)
 aux_source_directory(common APP_DIR)
 aux_source_directory(game APP_DIR)
 
-add_executable(uno ${APP_DIR} ${proto_srcs} ${grpc_srcs})
+add_executable(uno ${APP_DIR})
 
 set_target_properties(uno
     PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 )
 
-target_link_libraries(uno ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
+target_link_libraries(uno hello_proto_lib)
