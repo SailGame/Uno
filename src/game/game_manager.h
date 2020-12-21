@@ -3,10 +3,10 @@
 #include <functional>
 #include <thread>
 
+#include "../common/event_listener.h"
 #include "../common/event_loop.h"
 #include "../common/state_machine.h"
 #include "../ui/ui_manager.h"
-#include "event_listener.h"
 
 namespace SailGame { namespace Game {
 

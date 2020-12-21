@@ -8,7 +8,7 @@
 
 #include "hello.grpc.pb.h"
 
-namespace SailGame { namespace Game {
+namespace SailGame { namespace Common {
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -19,6 +19,8 @@ using grpc::Status;
 using Uno::NotifyMsg;
 using Uno::UnoService;
 using Uno::UserOperation;
+using Game::NetworkEvent;
+using Game::UserInputEvent;
 
 void NetworkEventListener::operator()()
 {

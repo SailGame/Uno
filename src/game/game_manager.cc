@@ -2,6 +2,10 @@
 
 namespace SailGame { namespace Game {
 
+using Common::NetworkEventListener;
+using Common::UserInputEventListener;
+using Common::TimerEventListener;
+
 GameManager::GameManager()
     : mEventLoop(std::make_unique<EventLoop>()),
     mStateMachine(std::make_unique<StateMachine>()),
