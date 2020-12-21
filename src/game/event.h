@@ -5,21 +5,21 @@
 
 #include "state.h"
 
-namespace SailGame { namespace Common {
+namespace SailGame { namespace Game {
 
 class Event {
 public:
-    virtual void Process(std::shared_ptr<Game::State> &state) = 0;
+    virtual void Process(std::shared_ptr<State> &state) = 0;
 };
 
-class NetPacketEvent : public Event {
+class NetworkEvent : public Event {
 };
 
 class UserInputEvent : public Event {
 public:
     UserInputEvent(char c) : mCharInputted(c) {}
 
-    virtual void Process(std::shared_ptr<Game::State> &state) override;
+    virtual void Process(std::shared_ptr<State> &state) override;
 
 private:
     char mCharInputted;

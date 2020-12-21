@@ -48,6 +48,15 @@ class HelloImpl final : public Hello::Service {
 
   Status BiStream(ServerContext* context,
                    ServerReaderWriter<IntWrapper, IntWrapper>* stream) override {
+    while (true) {
+      int c = 0;
+      std::cin >> c;
+      std::cout << c << std::endl;
+      IntWrapper intWrapper;
+      intWrapper.set_payload(c);
+      stream->Write(intWrapper);
+    }
+
     return Status::OK;
   }
 
