@@ -42,21 +42,46 @@ void TimerEvent::Process(std::shared_ptr<State> &state)
     std::cout << "time ticks" << std::endl;
 }
 
+// -------------------- NetworkEvent ---------------------
 void DrawNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    std::cout << mDraw.userid() << " " << mDraw.number() << std::endl;
+    state->mGameState.UpdateAfterDraw();
+    state->mPlayerStates[mDraw.userid()].UpdateAfterDraw(mDraw.number());
 }
 
 void SkipNetworkEvent::Process(std::shared_ptr<State> &state)
 {
+    state->mGameState.UpdateAfterSkip();
+    state->mPlayerStates[mSkip.userid()].UpdateAfterSkip();
 }
 
 void PlayNetworkEvent::Process(std::shared_ptr<State> &state)
 {
+    Card card{mPlay.card()};
+    state->mGameState.UpdateAfterPlay(card);
+    state->mPlayerStates[mPlay.userid()].UpdateAfterPlay(card);
 }
 
 void DrawRspNetworkEvent::Process(std::shared_ptr<State> &state)
 {
+    auto &gameState = state->mGameState;
+    assert(gameState.IsMyTurn());
+    gameState.UpdateAfterDraw();
+
+    auto &playerState = state->mPlayerStates[Config::mMyUserId];
+    auto number = mDrawRsp.cards().size();
+
+    auto handcardsBeforeDraw = state->mHandcards;
+    for (auto card : mDrawRsp.cards()) {
+        state->mHandcards.Draw(card);
+    }
+    if (number == 1) {
+        playerState.UpdateAfterDraw(number, 
+            state->mHandcards.GetIndexOfNewlyDrawn(handcardsBeforeDraw));
+    }
+    else {
+        playerState.UpdateAfterDraw(number);
+    }
 }
 
 void UnoNetworkEvent::Process(std::shared_ptr<State> &state)
