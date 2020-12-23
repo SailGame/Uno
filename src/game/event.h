@@ -16,6 +16,7 @@ using ::Uno::Play;
 using ::Uno::DrawRsp;
 using ::Uno::Uno;
 using ::Uno::Catch;
+using ::Uno::CatchRsp;
 using ::Uno::Doubt;
 using ::Uno::DoubtRsp;
 using ::Uno::JoinGame;
@@ -132,6 +133,17 @@ public:
 
 private:
     Catch mCatch;
+};
+
+class CatchRspNetworkEvent : public NetworkEvent {
+public:
+    CatchRspNetworkEvent(const CatchRsp &catchRsp) 
+        : NetworkEvent(EventType::CatchRspNetwork), mCatchRsp(catchRsp) {}
+
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
+
+private:
+    CatchRsp mCatchRsp;
 };
 
 class DoubtNetworkEvent : public NetworkEvent {

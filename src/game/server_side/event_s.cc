@@ -5,17 +5,33 @@ namespace SailGame { namespace Game {
 
 std::shared_ptr<NetworkEvent> NetworkEvent::Create(const NotifyMsg &msg)
 {
+    // server shouldn't receive NotifyMsg msg
     assert(false);
     return nullptr;
 }
 
 std::shared_ptr<NetworkEvent> NetworkEvent::Create(const UserOperation &msg)
 {
-    /// TODO: handle msg
-    if (msg.has_joingame()) {
-        return std::make_shared<JoinGameNetworkEvent>(msg.joingame());
+    switch (msg.Operation_case()) {
+        case UserOperation::OperationCase::kDraw:
+            return std::make_shared<DrawNetworkEvent>(msg.draw());
+        case UserOperation::OperationCase::kSkip: 
+            return std::make_shared<SkipNetworkEvent>(msg.skip());
+        case UserOperation::OperationCase::kPlay: 
+            return std::make_shared<PlayNetworkEvent>(msg.play());
+        case UserOperation::OperationCase::kUno: 
+            return std::make_shared<UnoNetworkEvent>(msg.uno());
+        case UserOperation::OperationCase::kCatch: 
+            return std::make_shared<CatchNetworkEvent>(msg.catch_());
+        case UserOperation::OperationCase::kDoubt: 
+            return std::make_shared<DoubtNetworkEvent>(msg.doubt());
+        case UserOperation::OperationCase::kJoinGame:
+        case UserOperation::OperationCase::kExit:
+            /// TODO: handle these two kinds of msg
+            return nullptr;
+        default:
+            assert(false);
     }
-    assert(false);
     return nullptr;
 }
 
