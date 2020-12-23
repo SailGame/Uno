@@ -1,5 +1,9 @@
 #pragma once
 
+#include <deque>
+#include <algorithm>
+#include <random>
+
 #include "hello.pb.h"
 
 namespace SailGame { namespace Game {
@@ -12,6 +16,7 @@ struct Card {
     CardText mText;
 
     Card() = default;
+    Card(CardColor color, CardText text) : mColor(color), mText(text) {}
     Card(const ::Uno::Card &card) : mColor(card.color()), mText(card.text()) {}
 
     Card(const Card &) = default;
@@ -58,10 +63,77 @@ private:
     std::multiset<Card> mCards;
 };
 
-class Deck {
+/**
+ * \c CardPile: a plie of cards, can be derived as \c Deck and \c DiscardPile
+ * providing some methods about push/pop, which can be used in different scenarios:
+ *   PushFront: Init deck in the game start. The card goes into discard pile.
+ *   PopFront:  Draw from deck.
+ *   PushBack:  When the flipped card is a wild card, put it back to under the deck.
+ *   PopBack:   not used yet
+ */
+class CardPile {
+protected:
+    template <typename... Types>
+    void PushFront(Types... args) {
+        mPile.emplace_front(args...);
+    }
+
+    Card PopFront() {
+        Card card = mPile.front();
+        mPile.pop_front();
+        return card;
+    }
+
+    template <typename... Types>
+    void PushBack(Types... args) {
+        mPile.emplace_back(args...);
+    }
+
+    Card PopBack() {
+        Card card = mPile.back();
+        mPile.pop_back();
+        return card;
+    }
+
+    void Shuffle() {
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(mPile.begin(), mPile.end(), g);
+    }
+
+    void Swap(CardPile &pile) { std::swap(mPile, pile.mPile); }
+
+    void Clear() { mPile.clear(); }
+
+    bool Empty() const { return mPile.empty(); }
+
+private:
+    std::deque<Card> mPile;
 };
 
-class DiscardPile {
+class DiscardPile : public CardPile {
+public:
+    void Add(Card card) { PushFront(card); }
+
+    void Clear() { CardPile::Clear(); }
 };
 
+class Deck : public CardPile {
+public:
+    Deck(DiscardPile &discardPile) : mDiscardPile(discardPile) {}
+
+    void Init();
+
+    std::vector<std::array<Card, 7>> DealInitHandCards(int playerNum);
+
+    Card Draw();
+
+    std::vector<Card> Draw(int number);
+
+    void PutToBottom(Card card) { PushBack(card); }
+    
+private:
+    // link a discard pile to deck. when the deck is exhausted, swap them
+    DiscardPile &mDiscardPile;
+};
 }}

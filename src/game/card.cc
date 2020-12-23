@@ -47,4 +47,55 @@ int Handcards::GetIndexOfNewlyDrawn(const Handcards &handcardsBeforeDraw) const
     return handcardsBeforeDraw.Number();
 }
 
+void Deck::Init()
+{
+    this->Clear();
+    mDiscardPile.Clear();
+    for (auto color : CardSet::NonWildColors) {
+        for (auto text : CardSet::NonWildTexts) {
+            PushFront(color, text);
+            if (text != CardText::ZERO) {
+                // in UNO, there is only one zero for each color
+                // and two cards for other text (except wild and wild draw four)
+                PushFront(color, text);
+            }
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        // there are four `wild` and `wild draw four` each
+        PushFront(CardColor::BLACK, CardText::WILD);
+        PushFront(CardColor::BLACK, CardText::DRAW_FOUR);
+    }
+
+    Shuffle();
+}
+
+std::vector<std::array<Card, 7>> Deck::DealInitHandCards(int playerNum)
+{
+    std::vector<std::array<Card, 7>> initHandCards(playerNum);
+    for (int card = 0; card < 7; card++) {
+        for (int player = 0; player < playerNum; player++) {
+            initHandCards[player][card] = Draw();
+        }
+    }
+    return initHandCards;
+}
+
+Card Deck::Draw()
+{
+    if (Empty()) {
+        Swap(mDiscardPile);
+        Shuffle();
+    }
+    return PopFront();
+}
+
+std::vector<Card> Deck::Draw(int number)
+{
+    std::vector<Card> cards(number);
+    std::generate(cards.begin(), cards.end(), [this]() { return Draw(); });
+    return cards;
+}
+
 }}

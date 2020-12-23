@@ -131,6 +131,11 @@ MsgTypePtrs CatchNetworkEvent::Process(std::shared_ptr<State> &state)
     return {};
 }
 
+MsgTypePtrs CatchRspNetworkEvent::Process(std::shared_ptr<State> &state)
+{
+    return {};
+}
+
 MsgTypePtrs DoubtNetworkEvent::Process(std::shared_ptr<State> &state)
 {
     return {};
