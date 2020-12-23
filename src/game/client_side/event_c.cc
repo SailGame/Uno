@@ -5,36 +5,34 @@ namespace SailGame { namespace Game {
 
 std::shared_ptr<NetworkEvent> NetworkEvent::Create(const NotifyMsg &msg)
 {
-    if (msg.has_draw()) {
-        return std::make_shared<DrawNetworkEvent>(msg.draw());
+    switch (msg.Msg_case()) {
+        case NotifyMsg::MsgCase::kDraw: 
+            return std::make_shared<DrawNetworkEvent>(msg.draw());
+        case NotifyMsg::MsgCase::kSkip: 
+            return std::make_shared<SkipNetworkEvent>(msg.skip());
+        case NotifyMsg::MsgCase::kPlay: 
+            return std::make_shared<PlayNetworkEvent>(msg.play());
+        case NotifyMsg::MsgCase::kDrawRsp: 
+            return std::make_shared<DrawRspNetworkEvent>(msg.drawrsp());
+        case NotifyMsg::MsgCase::kUno: 
+            return std::make_shared<UnoNetworkEvent>(msg.uno());
+        case NotifyMsg::MsgCase::kCatch: 
+            return std::make_shared<CatchNetworkEvent>(msg.catch_());
+        case NotifyMsg::MsgCase::kCatchRsp: 
+            return std::make_shared<CatchRspNetworkEvent>(msg.catchrsp());
+        case NotifyMsg::MsgCase::kDoubt: 
+            return std::make_shared<DoubtNetworkEvent>(msg.doubt());
+        case NotifyMsg::MsgCase::kDoubtRsp: 
+            return std::make_shared<DoubtRspNetworkEvent>(msg.doubtrsp());
+        default:
+            assert(false);
     }
-    if (msg.has_skip()) {
-        return std::make_shared<SkipNetworkEvent>(msg.skip());
-    }
-    if (msg.has_play()) {
-        return std::make_shared<PlayNetworkEvent>(msg.play());
-    }
-    if (msg.has_drawrsp()) {
-        return std::make_shared<DrawRspNetworkEvent>(msg.drawrsp());
-    }
-    if (msg.has_uno()) {
-        return std::make_shared<UnoNetworkEvent>(msg.uno());
-    }
-    if (msg.has_catch_()) {
-        return std::make_shared<CatchNetworkEvent>(msg.catch_());
-    }
-    if (msg.has_doubt()) {
-        return std::make_shared<DoubtNetworkEvent>(msg.doubt());
-    }
-    if (msg.has_doubtrsp()) {
-        return std::make_shared<DoubtRspNetworkEvent>(msg.doubtrsp());
-    }
-    assert(false);
     return nullptr;
 }
 
 std::shared_ptr<NetworkEvent> NetworkEvent::Create(const UserOperation &msg)
 {
+    // client shouldn't receive UserOperation msg
     assert(false);
     return nullptr;
 }
