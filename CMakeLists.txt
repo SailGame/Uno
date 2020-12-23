@@ -66,8 +66,8 @@ target_link_libraries(hello_proto_lib ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 # a mock server
-add_executable(hello_server hello_server.cc)
-target_link_libraries(hello_server hello_proto_lib)
+# add_executable(hello_server hello_server.cc)
+# target_link_libraries(hello_server hello_proto_lib)
 
 # uno
 add_subdirectory(src)

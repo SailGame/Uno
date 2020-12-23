@@ -1,12 +1,17 @@
 #pragma once
 
+#include <variant>
+#include <type_traits>
+
 #include "../game/event.h"
+#include "types.h"
 
 namespace SailGame { namespace Common {
 
 using Game::Event;
 using Game::State;
 using Uno::UserOperation;
+using Uno::NotifyMsg;
 
 template<typename StateT>
 class StateMachine {
@@ -15,7 +20,7 @@ public:
 
     StateMachine() : mState(std::make_shared<StateT>()) {}
 
-    std::shared_ptr<UserOperation> Transition(const std::shared_ptr<Event> &event) {
+    MsgTypePtr Transition(const std::shared_ptr<Event> &event) {
         return event->Process(mState);
     }
 

@@ -1,5 +1,5 @@
 #include "../event.h"
-#include "state_c.h"
+#include "state_s.h"
 
 namespace SailGame { namespace Game {
 
@@ -79,39 +79,16 @@ MsgTypePtr DrawNetworkEvent::Process(std::shared_ptr<State> &state)
 
 MsgTypePtr SkipNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    state->mGameState.UpdateAfterSkip();
-    state->mPlayerStates[mSkip.userid()].UpdateAfterSkip();
     return nullptr;
 }
 
 MsgTypePtr PlayNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    Card card{mPlay.card()};
-    state->mGameState.UpdateAfterPlay(card);
-    state->mPlayerStates[mPlay.userid()].UpdateAfterPlay(card);
     return nullptr;
 }
 
 MsgTypePtr DrawRspNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    auto &gameState = state->mGameState;
-    assert(gameState.IsMyTurn());
-    gameState.UpdateAfterDraw();
-
-    auto &playerState = state->mPlayerStates[Config::mMyUserId];
-    auto number = mDrawRsp.cards().size();
-
-    auto handcardsBeforeDraw = state->mHandcards;
-    for (auto card : mDrawRsp.cards()) {
-        state->mHandcards.Draw(card);
-    }
-    if (number == 1) {
-        playerState.UpdateAfterDraw(number, 
-            state->mHandcards.GetIndexOfNewlyDrawn(handcardsBeforeDraw));
-    }
-    else {
-        playerState.UpdateAfterDraw(number);
-    }
     return nullptr;
 }
 

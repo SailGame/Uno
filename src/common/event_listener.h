@@ -23,18 +23,6 @@ protected:
     std::function<void(const std::shared_ptr<Event> &)> OnEventHappens;
 };
 
-class NetworkEventListener : public EventListener {
-public:
-    NetworkEventListener(const std::function<void(const std::shared_ptr<Event> &)> &callback,
-        const std::string &serverAddr)
-        : EventListener(callback), mClient(std::make_unique<Client>(serverAddr)) {}
-    
-    void operator()();
-
-private:
-    std::unique_ptr<Client> mClient;
-};
-
 class UserInputEventListener : public EventListener {
 public:
     UserInputEventListener(const std::function<void(const std::shared_ptr<Event> &)> &callback)

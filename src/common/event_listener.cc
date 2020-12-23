@@ -6,14 +6,6 @@ using Game::NetworkEvent;
 using Game::UserInputEvent;
 using Game::TimerEvent;
 
-void NetworkEventListener::operator()()
-{
-    while (true) {
-        auto msg = mClient->Receive();
-        OnEventHappens(NetworkEvent::Create(msg));
-    }
-}
-
 void UserInputEventListener::operator()()
 {
     // while (true) {
