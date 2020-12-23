@@ -3,7 +3,7 @@
 #include <string>
 #include <thread>
 
-#include "game/game_manager.h"
+#include "game/client_side/game_manager_c.h"
 
 using SailGame::Game::GameManager;
 

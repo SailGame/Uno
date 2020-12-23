@@ -35,7 +35,11 @@ message NotifyMsg {
         Play play = 3;
         DrawRsp drawRsp = 4;
         Uno uno = 11;
+        // Catch and Doubt are real-time operation,
+        // which means multiple players can do that at the same time
+        // server just handles the first one and broadcast its result
         Catch catch = 12;
+        CatchRsp catchRsp = 13;
         Doubt doubt = 21;
         DoubtRsp doubtRsp = 22;
     }
@@ -74,15 +78,23 @@ message Catch {
     int32 caught = 2;
 }
 
+message CatchRsp {
+    int32 catcher = 1;
+    int32 caught = 2;
+    bool success = 3;
+}
+
 message Doubt {
     int32 doubter = 1;
     int32 doubted = 2;
 }
 
 message DoubtRsp {
-    bool success = 1;
+    int32 doubter = 1;
+    int32 doubted = 2;
+    bool success = 3;
     // the player doubted will show his handcards
-    repeated Card handcards = 2;
+    repeated Card handcards = 4;
 }
 
 message Exit {
