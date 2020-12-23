@@ -35,6 +35,7 @@ std::shared_ptr<NetworkEvent> NetworkEvent::Create(const NotifyMsg &msg)
 
 std::shared_ptr<NetworkEvent> NetworkEvent::Create(const UserOperation &msg)
 {
+    assert(false);
     return nullptr;
 }
 
@@ -56,43 +57,50 @@ std::shared_ptr<UserInputEvent> UserInputEvent::Create(char ch)
     return nullptr;
 }
 
-MsgTypePtr UserInputEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs UserInputEvent::Process(std::shared_ptr<State> &state)
 {
     // default handler for UserInputEvent, do nothing
-    return nullptr;
+    // Dummy
+    auto msg = std::make_shared<UserOperation>();
+    JoinGame *joinGame = msg->mutable_joingame();
+    static int x = 1;
+    joinGame->set_userid(x);
+    x++;
+    return {msg};
 }
 
-MsgTypePtr TimerEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs TimerEvent::Process(std::shared_ptr<State> &state)
 {
     std::cout << "time ticks" << std::endl;
-    return nullptr;
+    return {};
 }
 
 // -------------------- NetworkEvent ---------------------
-MsgTypePtr DrawNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs DrawNetworkEvent::Process(std::shared_ptr<State> &state)
 {
     // state->mGameState.UpdateAfterDraw();
     // state->mPlayerStates[mDraw.userid()].UpdateAfterDraw(mDraw.number());
+    std::cout << "process Draw Event" << std::endl;
     std::cout << mDraw.userid() << " " << mDraw.number() << std::endl;
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr SkipNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs SkipNetworkEvent::Process(std::shared_ptr<State> &state)
 {
     state->mGameState.UpdateAfterSkip();
     state->mPlayerStates[mSkip.userid()].UpdateAfterSkip();
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr PlayNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs PlayNetworkEvent::Process(std::shared_ptr<State> &state)
 {
     Card card{mPlay.card()};
     state->mGameState.UpdateAfterPlay(card);
     state->mPlayerStates[mPlay.userid()].UpdateAfterPlay(card);
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr DrawRspNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs DrawRspNetworkEvent::Process(std::shared_ptr<State> &state)
 {
     auto &gameState = state->mGameState;
     assert(gameState.IsMyTurn());
@@ -112,53 +120,53 @@ MsgTypePtr DrawRspNetworkEvent::Process(std::shared_ptr<State> &state)
     else {
         playerState.UpdateAfterDraw(number);
     }
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr UnoNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs UnoNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr CatchNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs CatchNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr DoubtNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs DoubtNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr DoubtRspNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs DoubtRspNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    return nullptr;
+    return {};
 }
 
 // -------------------- UserInputEvent ---------------------
-MsgTypePtr CursorMoveLeftUserInputEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs CursorMoveLeftUserInputEvent::Process(std::shared_ptr<State> &state)
 {
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr CursorMoveRightUserInputEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs CursorMoveRightUserInputEvent::Process(std::shared_ptr<State> &state)
 {    
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr PlayUserInputEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs PlayUserInputEvent::Process(std::shared_ptr<State> &state)
 {    
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr PassUserInputEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs PassUserInputEvent::Process(std::shared_ptr<State> &state)
 {    
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr QuitUserInputEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs QuitUserInputEvent::Process(std::shared_ptr<State> &state)
 {    
-    return nullptr;
+    return {};
 }
 
 }}

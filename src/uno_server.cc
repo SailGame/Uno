@@ -1,8 +1,3 @@
-#include <iostream>
-#include <memory>
-#include <string>
-#include <thread>
-
 #include "game/server_side/game_manager_s.h"
 
 using SailGame::Game::GameManager;

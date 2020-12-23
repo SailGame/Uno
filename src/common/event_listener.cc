@@ -8,10 +8,13 @@ using Game::TimerEvent;
 
 void UserInputEventListener::operator()()
 {
-    // while (true) {
-    //     auto ch = Util::GetCharImmediately();
-    //     OnEventHappens(UserInputEvent::Create(ch));
-    // }
+    while (true) {
+        // auto ch = Util::GetCharImmediately();
+        // OnEventHappens(UserInputEvent::Create(ch));
+        // int a;
+        // std::cin >> a;
+        // OnEventHappens(std::make_shared<UserInputEvent>());
+    }
 }
 
 void TimerEventListener::operator()()
