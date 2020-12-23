@@ -6,8 +6,8 @@
 namespace SailGame { namespace Game {
 
 struct State {
-    Deck mDeck;
     DiscardPile mDiscardPile;
+    Deck mDeck{mDiscardPile};
     std::vector<Handcards> mHandcards;
     std::map<int, int> mPlayerIndexToUserId;
 };
