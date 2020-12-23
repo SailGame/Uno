@@ -5,137 +5,132 @@ namespace SailGame { namespace Game {
 
 std::shared_ptr<NetworkEvent> NetworkEvent::Create(const NotifyMsg &msg)
 {
-    if (msg.has_draw()) {
-        return std::make_shared<DrawNetworkEvent>(msg.draw());
-    }
-    if (msg.has_skip()) {
-        return std::make_shared<SkipNetworkEvent>(msg.skip());
-    }
-    if (msg.has_play()) {
-        return std::make_shared<PlayNetworkEvent>(msg.play());
-    }
-    if (msg.has_drawrsp()) {
-        return std::make_shared<DrawRspNetworkEvent>(msg.drawrsp());
-    }
-    if (msg.has_uno()) {
-        return std::make_shared<UnoNetworkEvent>(msg.uno());
-    }
-    if (msg.has_catch_()) {
-        return std::make_shared<CatchNetworkEvent>(msg.catch_());
-    }
-    if (msg.has_doubt()) {
-        return std::make_shared<DoubtNetworkEvent>(msg.doubt());
-    }
-    if (msg.has_doubtrsp()) {
-        return std::make_shared<DoubtRspNetworkEvent>(msg.doubtrsp());
-    }
     assert(false);
     return nullptr;
 }
 
 std::shared_ptr<NetworkEvent> NetworkEvent::Create(const UserOperation &msg)
 {
-    return nullptr;
-}
-
-std::shared_ptr<UserInputEvent> UserInputEvent::Create(char ch)
-{
-    switch (ch) {
-        case ',':  return std::make_shared<CursorMoveLeftUserInputEvent>();
-        case '.':  return std::make_shared<CursorMoveRightUserInputEvent>();
-#if defined(__unix__) || defined(__APPLE__)
-        case '\n': return std::make_shared<PlayUserInputEvent>();
-#elif defined(_WIN32)
-        case '\r': return std::make_shared<PlayUserInputEvent>();
-#endif
-        case ' ':  return std::make_shared<PassUserInputEvent>();
-        case 'q': case 'Q': return std::make_shared<QuitUserInputEvent>();
-        default: return std::make_shared<UserInputEvent>();
+    /// TODO: handle msg
+    if (msg.has_joingame()) {
+        return std::make_shared<JoinGameNetworkEvent>(msg.joingame());
     }
     assert(false);
     return nullptr;
 }
 
-MsgTypePtr UserInputEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserInputEvent> UserInputEvent::Create(char ch)
 {
-    // default handler for UserInputEvent, do nothing
+    assert(false);
     return nullptr;
 }
 
-MsgTypePtr TimerEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs UserInputEvent::Process(std::shared_ptr<State> &state)
 {
-    std::cout << "time ticks" << std::endl;
-    return nullptr;
+    assert(false);
+    return {};
+}
+
+MsgTypePtrs TimerEvent::Process(std::shared_ptr<State> &state)
+{
+    assert(false);
+    return {};
+}
+
+static MsgTypePtrs CreateMsgTypePtrs(int curPlayerIndex,
+    const MsgTypePtr &rspMsg, const MsgTypePtr &broadcastMsg)
+{
+    MsgTypePtrs msgTypePtrs;
+    for (int i = 0; i < Config::mPlayerNum; i++) {
+        msgTypePtrs.push_back(i == curPlayerIndex ? rspMsg : broadcastMsg);
+    }
+    return msgTypePtrs;
 }
 
 // -------------------- NetworkEvent ---------------------
-MsgTypePtr DrawNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs DrawNetworkEvent::Process(std::shared_ptr<State> &state)
 {
     // state->mGameState.UpdateAfterDraw();
     // state->mPlayerStates[mDraw.userid()].UpdateAfterDraw(mDraw.number());
     std::cout << mDraw.userid() << " " << mDraw.number() << std::endl;
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr SkipNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs SkipNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr PlayNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs PlayNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr DrawRspNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs DrawRspNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr UnoNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs UnoNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr CatchNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs CatchNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr DoubtNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs DoubtNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    return nullptr;
+    return {};
 }
 
-MsgTypePtr DoubtRspNetworkEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs DoubtRspNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    return nullptr;
+    return {};
+}
+
+MsgTypePtrs JoinGameNetworkEvent::Process(std::shared_ptr<State> &state)
+{
+    // Dummy
+    std::cout << "process JoinGame Event" << std::endl;
+    auto msg = std::make_shared<NotifyMsg>();
+    Draw *draw = msg->mutable_draw();
+    draw->set_userid(mJoinGame.userid());
+    draw->set_number(16);
+    return CreateMsgTypePtrs(1, msg, msg);
 }
 
 // -------------------- UserInputEvent ---------------------
-MsgTypePtr CursorMoveLeftUserInputEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs CursorMoveLeftUserInputEvent::Process(std::shared_ptr<State> &state)
 {
-    return nullptr;
+    assert(false);
+    return {};
 }
 
-MsgTypePtr CursorMoveRightUserInputEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs CursorMoveRightUserInputEvent::Process(std::shared_ptr<State> &state)
 {    
-    return nullptr;
+    assert(false);
+    return {};
 }
 
-MsgTypePtr PlayUserInputEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs PlayUserInputEvent::Process(std::shared_ptr<State> &state)
 {    
-    return nullptr;
+    assert(false);
+    return {};
 }
 
-MsgTypePtr PassUserInputEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs PassUserInputEvent::Process(std::shared_ptr<State> &state)
 {    
-    return nullptr;
+    assert(false);
+    return {};
 }
 
-MsgTypePtr QuitUserInputEvent::Process(std::shared_ptr<State> &state)
+MsgTypePtrs QuitUserInputEvent::Process(std::shared_ptr<State> &state)
 {    
-    return nullptr;
+    assert(false);
+    return {};
 }
 
 }}

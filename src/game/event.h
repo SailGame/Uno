@@ -18,46 +18,65 @@ using ::Uno::Uno;
 using ::Uno::Catch;
 using ::Uno::Doubt;
 using ::Uno::DoubtRsp;
+using ::Uno::JoinGame;
+using Common::UserOperationPtr;
+using Common::NotifyMsgPtr;
 using Common::MsgTypePtr;
+using Common::MsgTypePtrs;
 
 struct State;
 
+enum class EventType {
+    Network, UserInput, Timer,
+    DrawNetwork, SkipNetwork, PlayNetwork, DrawRspNetwork,
+    UnoNetwork, CatchNetwork, CatchRspNetwork,
+    DoubtNetwork, DoubtRspNetwork,
+    JoinGameNetwork
+};
+
 class Event {
 public:
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) = 0;
+    Event(EventType type) : mType(type) {}
+
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) = 0;
+
+public:
+    EventType mType;
 };
 
 class NetworkEvent : public Event {
 public:
+    NetworkEvent(EventType type) : Event(type) {}
+
     static std::shared_ptr<NetworkEvent> Create(const NotifyMsg &msg);
     
     static std::shared_ptr<NetworkEvent> Create(const UserOperation &msg);
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override = 0;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override = 0;
 };
 
 class UserInputEvent : public Event {
 public:
     static std::shared_ptr<UserInputEvent> Create(char ch);
 
-    UserInputEvent() = default;
+    UserInputEvent() : Event(EventType::UserInput) {}
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 };
 
 class TimerEvent : public Event {
 public:
-    TimerEvent() = default;
+    TimerEvent() : Event(EventType::Timer) {}
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 };
 
 // -------------------- NetworkEvent ---------------------
 class DrawNetworkEvent : public NetworkEvent {
 public:
-    DrawNetworkEvent(const Draw &draw) : mDraw(draw) {}
+    DrawNetworkEvent(const Draw &draw) : NetworkEvent(EventType::DrawNetwork), mDraw(draw) {}
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 
 private:
     Draw mDraw;
@@ -65,9 +84,9 @@ private:
 
 class SkipNetworkEvent : public NetworkEvent {
 public:
-    SkipNetworkEvent(const Skip &skip) : mSkip(skip) {}
+    SkipNetworkEvent(const Skip &skip) : NetworkEvent(EventType::SkipNetwork), mSkip(skip) {}
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 
 private:
     Skip mSkip;
@@ -75,9 +94,9 @@ private:
 
 class PlayNetworkEvent : public NetworkEvent {
 public:
-    PlayNetworkEvent(const Play &play) : mPlay(play) {}
+    PlayNetworkEvent(const Play &play) : NetworkEvent(EventType::PlayNetwork), mPlay(play) {}
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 
 private:
     Play mPlay;
@@ -85,9 +104,10 @@ private:
 
 class DrawRspNetworkEvent : public NetworkEvent {
 public:
-    DrawRspNetworkEvent(const DrawRsp &drawRsp) : mDrawRsp(drawRsp) {}
+    DrawRspNetworkEvent(const DrawRsp &drawRsp) 
+        : NetworkEvent(EventType::DrawRspNetwork), mDrawRsp(drawRsp) {}
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 
 private:
     DrawRsp mDrawRsp;
@@ -95,9 +115,9 @@ private:
 
 class UnoNetworkEvent : public NetworkEvent {
 public:
-    UnoNetworkEvent(const Uno &uno) : mUno(uno) {}
+    UnoNetworkEvent(const Uno &uno) : NetworkEvent(EventType::UnoNetwork), mUno(uno) {}
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 
 private:
     Uno mUno;
@@ -105,9 +125,10 @@ private:
 
 class CatchNetworkEvent : public NetworkEvent {
 public:
-    CatchNetworkEvent(const Catch &catch_) : mCatch(catch_) {}
+    CatchNetworkEvent(const Catch &catch_) 
+        : NetworkEvent(EventType::CatchNetwork), mCatch(catch_) {}
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 
 private:
     Catch mCatch;
@@ -115,9 +136,10 @@ private:
 
 class DoubtNetworkEvent : public NetworkEvent {
 public:
-    DoubtNetworkEvent(const Doubt &doubt) : mDoubt(doubt) {}
+    DoubtNetworkEvent(const Doubt &doubt) 
+        : NetworkEvent(EventType::DoubtNetwork), mDoubt(doubt) {}
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 
 private:
     Doubt mDoubt;
@@ -125,12 +147,24 @@ private:
 
 class DoubtRspNetworkEvent : public NetworkEvent {
 public:
-    DoubtRspNetworkEvent(const DoubtRsp &doubtRsp) : mDoubtRsp(doubtRsp) {}
+    DoubtRspNetworkEvent(const DoubtRsp &doubtRsp) 
+        : NetworkEvent(EventType::DoubtRspNetwork), mDoubtRsp(doubtRsp) {}
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 
 private:
     DoubtRsp mDoubtRsp;
+};
+
+class JoinGameNetworkEvent : public NetworkEvent {
+public:
+    JoinGameNetworkEvent(const JoinGame &joinGame) 
+        : NetworkEvent(EventType::JoinGameNetwork), mJoinGame(joinGame) {}
+
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
+
+private:
+    JoinGame mJoinGame;
 };
 
 // -------------------- UserInputEvent ---------------------
@@ -138,35 +172,35 @@ class CursorMoveLeftUserInputEvent : public UserInputEvent {
 public:
     CursorMoveLeftUserInputEvent() = default;
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 };
 
 class CursorMoveRightUserInputEvent : public UserInputEvent {
 public:
     CursorMoveRightUserInputEvent() = default;
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 };
 
 class PlayUserInputEvent : public UserInputEvent {
 public:
     PlayUserInputEvent() = default;
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 };
 
 class PassUserInputEvent : public UserInputEvent {
 public:
     PassUserInputEvent() = default;
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 };
 
 class QuitUserInputEvent : public UserInputEvent {
 public:
     QuitUserInputEvent() = default;
 
-    virtual MsgTypePtr Process(std::shared_ptr<State> &state) override;
+    virtual MsgTypePtrs Process(std::shared_ptr<State> &state) override;
 };
 
 }}

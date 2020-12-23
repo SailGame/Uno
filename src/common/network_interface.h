@@ -3,10 +3,15 @@
 #include <thread>
 #include <type_traits>
 #include "../game/event.h"
-#include "../network/client.h"
-#include "../network/server.h"
 
-namespace SailGame { namespace Common {
+namespace SailGame { 
+
+namespace Network {
+class Client;
+class Server;
+}
+
+namespace Common {
 
 using Game::Event;
 using Game::NetworkEvent;
@@ -25,6 +30,7 @@ public:
             [this](const NotifyMsg &msg) { ProcessMsg(msg); }))
     {
         static_assert(std::is_same_v<PeerT, Client>);
+        mPeer->Connect();
     }
 
     NetworkInterface(const std::function<void(const std::shared_ptr<NetworkEvent> &)> &callback,
@@ -34,6 +40,7 @@ public:
             [this](const UserOperation &msg) { ProcessMsg(msg); }))
     {
         static_assert(std::is_same_v<PeerT, Server>);
+        mPeer->Start();
     }
 
     template<typename MsgT>
@@ -43,9 +50,9 @@ public:
     }
 
     template<typename MsgT>
-    void SendMsg(int userId, const MsgT &msg) {
+    void SendMsg(int playerIndex, const MsgT &msg) {
         static_assert(std::is_same_v<PeerT, Server>);
-        mPeer->Send(userId, msg);
+        mPeer->Send(playerIndex, msg);
     }
 
     template<typename MsgT>

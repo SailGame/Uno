@@ -6,49 +6,53 @@ Server::Server(int port,
     const std::function<void(const UserOperation &)> &newMsgCallback)
     : OnNewMsg(newMsgCallback)
 {
-    // port = 50051
-    std::string server_address("0.0.0.0:" + std::to_string(port));
-
-    HelloImpl service(
-        [this](int userId, ServerReaderWriter<NotifyMsg, UserOperation> *stream) {
-            HandleNewConnection(userId, stream);
+    mUnoService = std::make_unique<HelloImpl>(
+        [this](ServerReaderWriter<NotifyMsg, UserOperation> *stream) {
+            HandleNewConnection(stream);
         }
     );
 
+    std::string serverAddr("0.0.0.0:" + std::to_string(port));
     ServerBuilder builder;
-    builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
-    builder.RegisterService(&service);
+    builder.AddListeningPort(serverAddr, grpc::InsecureServerCredentials());
+    builder.RegisterService(mUnoService.get());
     mGrpcServer = builder.BuildAndStart();
-    std::cout << "Server listening on " << server_address << std::endl;
+    std::cout << "Server listening on " << serverAddr << std::endl;
 }
 
 void Server::Start()
 {
-    mGrpcServer->Wait();
+    auto listenFunc = [this] {
+        mGrpcServer->Wait();
+    };
+
+    /// TODO: where to join the thread
+    mListenThread = std::make_unique<std::thread>(listenFunc);
 }
 
-void Server::HandleNewConnection(int userId, 
-    ServerReaderWriter<NotifyMsg, UserOperation> *stream)
+void Server::HandleNewConnection(ServerReaderWriter<NotifyMsg, UserOperation> *stream)
 {
-    mStreams[userId] = std::shared_ptr<ServerReaderWriter<NotifyMsg, UserOperation>>(stream);
+    std::cout << "[in] HandleNewConnection" << std::endl;
+    // static int curPlayerIndex = 0;
+    mStreams.push_back(std::shared_ptr<ServerReaderWriter<NotifyMsg, UserOperation>>(stream));
+
     UserOperation msg;
+    stream->Read(&msg);
+    // the first msg must be JoinGame
+    assert(msg.has_joingame());
+    /// TODO: handle mapping from playerIndex to userId
+    auto userId = msg.joingame().userid();
+    OnNewMsg(msg);
+
+    std::cout << "new player, userId: " << userId << std::endl;
+
     while (stream->Read(&msg)) {
         OnNewMsg(msg);
     }
 }
 
-// UserOperation Server::Receive(int userId)
-// {
-//     UserOperation msg;
-//     if (mStreams[userId]->Read(&msg)) {
-//         return msg;
-//     }
-//     std::cout << "server receive failure" << std::endl;
-//     std::exit(-1);
-// }
-
-void Server::Send(int userId, const NotifyMsg &msg)
+void Server::Send(int playerIndex, const NotifyMsg &msg)
 {
-    mStreams[userId]->Write(msg);
+    mStreams[playerIndex]->Write(msg);
 }
 }}

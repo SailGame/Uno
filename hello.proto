@@ -23,6 +23,8 @@ message UserOperation {
         // someone doesn't yell 'UNO' with only 1 card
         Catch catch = 12;
         Doubt doubt = 21;
+        /// XXX: use message type defined in core
+        JoinGame joinGame = 90;
 
         Exit exit = 101;
     }
@@ -95,6 +97,11 @@ message DoubtRsp {
     bool success = 3;
     // the player doubted will show his handcards
     repeated Card handcards = 4;
+}
+
+message JoinGame {
+    int32 userId = 1;
+    string username = 2;
 }
 
 message Exit {

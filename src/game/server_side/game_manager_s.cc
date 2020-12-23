@@ -2,11 +2,6 @@
 
 namespace SailGame { namespace Game {
 
-// using Common::NetworkEventListener;
-using Common::NotifyMsgPtr;
-using Common::TimerEventListener;
-using Common::UserInputEventListener;
-
 GameManager::GameManager()
     : mEventLoop(std::make_unique<EventLoop>()),
     mStateMachine(std::make_unique<StateMachine<State>>())
@@ -32,11 +27,12 @@ void GameManager::Start()
 
 void GameManager::ProcessEvent(const std::shared_ptr<Event> &event)
 {
-    auto notifyMsg = mStateMachine->Transition(event);
-    /// TODO: invoke ui manager
-    if (notifyMsg) {
-        /// XXX: use correct userId
-        mNetworkInterface->SendMsg(0, std::get<NotifyMsg>(*notifyMsg));
+    auto notifyMsgs = mStateMachine->Transition(event);
+    assert(notifyMsgs.size() == Config::mPlayerNum);
+    /// XXX: send them asynchronously at the same time (not sequentially) for fairness
+    for (int i = 0; i < notifyMsgs.size(); i++) {
+        const auto &msg = *std::get<NotifyMsgPtr>(notifyMsgs[i]);
+        mNetworkInterface->SendMsg(i, msg);
     }
 }
 

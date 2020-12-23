@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../card.h"
+#include "../config.h"
 
 namespace SailGame { namespace Game {
 

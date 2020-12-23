@@ -1,12 +1,8 @@
 #pragma once
 
-#include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <iostream>
 #include <memory>
+#include <thread>
 #include <string>
-
 #include <grpc/grpc.h>
 #include <grpcpp/server.h>
 #include <grpcpp/server_builder.h>
@@ -17,7 +13,6 @@
 
 namespace SailGame { namespace Network {
 
-// using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::ServerReader;
@@ -29,64 +24,46 @@ using Uno::UserOperation;
 using Uno::NotifyMsg;
 using Uno::UnoService;
 
+class HelloImpl;
+
 class Server {
 public:
     Server(int port, const std::function<void(const UserOperation &)> &newMsgCallback);
 
     void Start();
 
-    void HandleNewConnection(int userId, 
-        ServerReaderWriter<NotifyMsg, UserOperation> *stream);
+    void HandleNewConnection(ServerReaderWriter<NotifyMsg, UserOperation> *stream);
 
-    // UserOperation Receive(int userId);
-
-    void Send(int userId, const NotifyMsg &msg);
+    void Send(int playerIndex, const NotifyMsg &msg);
 
 private:
     std::function<void(const UserOperation &)> OnNewMsg;
 
 private:
     std::unique_ptr<grpc::Server> mGrpcServer;
-
-    std::map<int, std::shared_ptr<ServerReaderWriter<NotifyMsg, UserOperation>>> mStreams;
+    std::unique_ptr<HelloImpl> mUnoService;
+    std::vector<std::shared_ptr<ServerReaderWriter<NotifyMsg, UserOperation>>> mStreams;
+    std::unique_ptr<std::thread> mListenThread;
 };
 
 class HelloImpl final : public UnoService::Service
 {
 public:
     explicit HelloImpl(
-        const std::function<void(int, ServerReaderWriter<NotifyMsg, UserOperation> *)> &callback)
+        const std::function<void(ServerReaderWriter<NotifyMsg, UserOperation> *)> &callback)
         : OnNewConnection(callback)
     {}
 
     Status BiStream(ServerContext *context,
                     ServerReaderWriter<NotifyMsg, UserOperation> *stream) override
     {
-        /// TODO: get the correct userId
-        OnNewConnection(0, stream);
-        // listenFunc();
-        // while (true)
-        // {
-        //     UserOperation msg;
-        //     stream->Read(&msg);
-        //     // cout msg
-
-        //     int userid = 0;
-        //     int number = 0;
-        //     std::cout << context << std::endl;
-        //     std::cin >> userid >> number;
-        //     Uno::NotifyMsg msg;
-        //     Uno::Draw *draw = msg.mutable_draw();
-        //     draw->set_userid(userid);
-        //     draw->set_number(number);
-        //     stream->Write(msg);
-        // }
-
+        std::cout << "new connection" << std::endl;
+        OnNewConnection(stream);
         return Status::OK;
     }
 
 private:
-    std::function<void(int, ServerReaderWriter<NotifyMsg, UserOperation> *)> OnNewConnection;
+    std::function<void(ServerReaderWriter<NotifyMsg, UserOperation> *)> OnNewConnection;
 };
 
 }}

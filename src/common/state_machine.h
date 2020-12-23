@@ -20,7 +20,7 @@ public:
 
     StateMachine() : mState(std::make_shared<StateT>()) {}
 
-    MsgTypePtr Transition(const std::shared_ptr<Event> &event) {
+    MsgTypePtrs Transition(const std::shared_ptr<Event> &event) {
         return event->Process(mState);
     }
 
