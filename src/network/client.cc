@@ -29,7 +29,6 @@ NotifyMsg Client::Receive()
 
 void Client::Send(const UserOperation &msg)
 {
-
+    mStream->Write(msg);
 }
-
 }}
