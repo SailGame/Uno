@@ -2,7 +2,9 @@
 
 namespace SailGame { namespace Network {
 
-Client::Client(const std::string &endpoint)
+Client::Client(const std::string &endpoint,
+    const std::function<void(const NotifyMsg &)> &newMsgCallback)
+    : OnNewMsg(newMsgCallback)
 {
     std::shared_ptr<Channel> channel(grpc::CreateChannel(
         endpoint, grpc::InsecureChannelCredentials()));
@@ -11,7 +13,19 @@ Client::Client(const std::string &endpoint)
     mContext = std::make_shared<ClientContext>();
     mStream = stub->BiStream(mContext.get());
 
+    /// XXX: remove this
     mStream->WritesDone();
+
+    auto listenFunc = [this] {
+        while (true) {
+            auto msg = Receive();
+            OnNewMsg(msg);
+            // OnEventHappens(NetworkEvent::Create(msg));
+        }
+    };
+
+    /// TODO: where to join the thread
+    mListenThread = std::make_unique<std::thread>(listenFunc);
 }
 
 NotifyMsg Client::Receive()

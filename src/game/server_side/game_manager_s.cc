@@ -1,25 +1,22 @@
-#include "game_manager_c.h"
+#include "game_manager_s.h"
 
 namespace SailGame { namespace Game {
 
 // using Common::NetworkEventListener;
+using Common::NotifyMsgPtr;
 using Common::TimerEventListener;
 using Common::UserInputEventListener;
-using Common::UserOperationPtr;
 
 GameManager::GameManager()
     : mEventLoop(std::make_unique<EventLoop>()),
-    mStateMachine(std::make_unique<StateMachine<State>>()),
-    mUIManager(std::make_unique<UIManager>())
+    mStateMachine(std::make_unique<StateMachine<State>>())
 {
     auto callback = [this](const std::shared_ptr<Event> &event) {
         mEventLoop->AppendEvent(event);
     };
 
-    mNetworkInterface = std::make_unique<NetworkInterface<Client>>(
-        NetworkInterface<Client>{callback, "localhost:50051"});
-    mUserInputThread = std::make_unique<std::thread>(UserInputEventListener{callback});
-    mTimerThread = std::make_unique<std::thread>(TimerEventListener{callback});
+    mNetworkInterface = std::make_unique<NetworkInterface<Server>>(
+        NetworkInterface<Server>{callback, 50051});
 }
 
 void GameManager::Start()
@@ -35,10 +32,11 @@ void GameManager::Start()
 
 void GameManager::ProcessEvent(const std::shared_ptr<Event> &event)
 {
-    auto userOperation = mStateMachine->Transition(event);
+    auto notifyMsg = mStateMachine->Transition(event);
     /// TODO: invoke ui manager
-    if (userOperation) {
-        mNetworkInterface->SendMsg(std::get<UserOperation>(*userOperation));
+    if (notifyMsg) {
+        /// XXX: use correct userId
+        mNetworkInterface->SendMsg(0, std::get<NotifyMsg>(*notifyMsg));
     }
 }
 

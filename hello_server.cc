@@ -45,13 +45,22 @@ using Uno::UnoService;
 
 class HelloImpl final : public UnoService::Service {
  public:
-  explicit HelloImpl() {}
+  explicit HelloImpl() {
+    // register callback
+  }
 
   Status BiStream(ServerContext* context,
                    ServerReaderWriter<NotifyMsg, UserOperation>* stream) override {
-    while (true) {
+    mStreams.push_back(std::shared_ptr<ServerReaderWriter<NotifyMsg, UserOperation>>(stream));
+    while (true)
+    {
+      UserOperation msg;
+      stream->Read(&msg);
+      // cout msg
+
       int userid = 0;
       int number = 0;
+      std::cout << context << std::endl;
       std::cin >> userid >> number;
       Uno::NotifyMsg msg;
       Uno::Draw *draw = msg.mutable_draw();
@@ -64,6 +73,8 @@ class HelloImpl final : public UnoService::Service {
   }
 
  private:
+   /// XXX: should use a map (from userid to stream)
+   std::vector<std::shared_ptr<ServerReaderWriter<NotifyMsg, UserOperation>>> mStreams;
 };
 
 void RunServer() {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <thread>
 #include <string>
 #include <grpc/grpc.h>
 #include <grpcpp/channel.h>
@@ -24,14 +25,19 @@ using Uno::UserOperation;
 
 class Client {
 public:
-    Client(const std::string &endpoint);
+    Client(const std::string &endpoint, 
+        const std::function<void(const NotifyMsg &)> &newMsgCallback);
 
     NotifyMsg Receive();
 
     void Send(const UserOperation &msg);
 
 private:
+    std::function<void(const NotifyMsg &)> OnNewMsg;
+
+private:
     std::shared_ptr<ClientContext> mContext;
     std::shared_ptr<ClientReaderWriter<UserOperation, NotifyMsg>> mStream;
+    std::unique_ptr<std::thread> mListenThread;
 };
 }}

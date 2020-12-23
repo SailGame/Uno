@@ -7,17 +7,15 @@
 #include "../../common/event_loop.h"
 #include "../../common/state_machine.h"
 #include "../../common/network_interface.h"
-#include "../../ui/ui_manager.h"
-#include "../../network/client.h"
-#include "state_c.h"
+#include "../../network/server.h"
+#include "state_s.h"
 
 namespace SailGame { namespace Game {
 
 using Common::EventLoop;
-using Common::NetworkInterface;
 using Common::StateMachine;
-using Network::Client;
-using UI::UIManager;
+using Common::NetworkInterface;
+using Network::Server;
 
 class GameManager {
 public:
@@ -30,10 +28,6 @@ public:
 private:
     std::unique_ptr<EventLoop> mEventLoop;
     std::unique_ptr<StateMachine<State>> mStateMachine;
-    std::unique_ptr<NetworkInterface<Client>> mNetworkInterface;
-    std::unique_ptr<UIManager> mUIManager;
-
-    std::unique_ptr<std::thread> mUserInputThread;
-    std::unique_ptr<std::thread> mTimerThread;
+    std::unique_ptr<NetworkInterface<Server>> mNetworkInterface;
 };
 }}
