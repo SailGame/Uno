@@ -1,4 +1,5 @@
-#include "event.h"
+#include "../event.h"
+#include "state_c.h"
 
 namespace SailGame { namespace Game {
 
@@ -63,8 +64,9 @@ void TimerEvent::Process(std::shared_ptr<State> &state)
 // -------------------- NetworkEvent ---------------------
 void DrawNetworkEvent::Process(std::shared_ptr<State> &state)
 {
-    state->mGameState.UpdateAfterDraw();
-    state->mPlayerStates[mDraw.userid()].UpdateAfterDraw(mDraw.number());
+    // state->mGameState.UpdateAfterDraw();
+    // state->mPlayerStates[mDraw.userid()].UpdateAfterDraw(mDraw.number());
+    std::cout << mDraw.userid() << " " << mDraw.number() << std::endl;
 }
 
 void SkipNetworkEvent::Process(std::shared_ptr<State> &state)

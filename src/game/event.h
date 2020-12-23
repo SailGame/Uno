@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "hello.pb.h"
-#include "state.h"
+// #include "state.h"
 
 namespace SailGame { namespace Game {
 
@@ -17,6 +17,8 @@ using ::Uno::Uno;
 using ::Uno::Catch;
 using ::Uno::Doubt;
 using ::Uno::DoubtRsp;
+
+struct State;
 
 class Event {
 public:

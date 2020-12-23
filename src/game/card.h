@@ -36,4 +36,32 @@ struct CardSet {
     const static std::set<CardText> DrawTexts;
 };
 
+class Handcards {
+public:
+    void Draw(Card card);
+
+    void Draw(const std::vector<Card> &cards);
+
+    void Erase(int index);
+
+    int GetIndex(Card card) const;
+
+    int GetIndexOfNewlyDrawn(const Handcards &handcardsBeforeDraw) const;
+
+    bool Empty() const { return mCards.empty(); }
+
+    Card At(int index) const { return *std::next(mCards.begin(), index); }
+
+    int Number() const { return mCards.size(); }
+
+private:
+    std::multiset<Card> mCards;
+};
+
+class Deck {
+};
+
+class DiscardPile {
+};
+
 }}

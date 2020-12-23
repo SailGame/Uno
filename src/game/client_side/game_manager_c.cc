@@ -1,4 +1,4 @@
-#include "game_manager.h"
+#include "game_manager_c.h"
 
 namespace SailGame { namespace Game {
 
@@ -8,7 +8,7 @@ using Common::TimerEventListener;
 
 GameManager::GameManager()
     : mEventLoop(std::make_unique<EventLoop>()),
-    mStateMachine(std::make_unique<StateMachine>()),
+    mStateMachine(std::make_unique<StateMachine<State>>()),
     mUIManager(std::make_unique<UIManager>())
 {
     auto callback = [this](const std::shared_ptr<Event> &event) {

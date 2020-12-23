@@ -1,4 +1,4 @@
-#include "state.h"
+#include "state_c.h"
 
 namespace SailGame { namespace Game {
 
@@ -84,41 +84,6 @@ void PlayerState::UpdateAfterPlay(Card card)
     mDoPlayInLastRound = true;
     mLastPlayedCard = card;
     mHasChanceToPlayAfterDraw = false;
-}
-
-void Handcards::Draw(Card card)
-{
-    mCards.emplace(card);
-}
-
-void Handcards::Draw(const std::vector<Card> &cards)
-{
-    std::for_each(cards.begin(), cards.end(), [this](Card card) {
-        Draw(card);
-    });
-}
-
-void Handcards::Erase(int index)
-{
-    mCards.erase(std::next(mCards.begin(), index));
-}
-
-int Handcards::GetIndex(Card card) const
-{
-    auto it = mCards.find(card);
-    assert(it != mCards.end());
-    return std::distance(mCards.begin(), it);
-}
-
-int Handcards::GetIndexOfNewlyDrawn(const Handcards &handcardsBeforeDraw) const
-{
-    assert(Number() == handcardsBeforeDraw.Number() + 1);
-    for (int i = 0; i < handcardsBeforeDraw.Number(); i++) {
-        if (At(i) != handcardsBeforeDraw.At(i)) {
-            return i;
-        }
-    }
-    return handcardsBeforeDraw.Number();
 }
 
 }}
