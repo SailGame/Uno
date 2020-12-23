@@ -16,10 +16,10 @@ void NetworkEventListener::operator()()
 
 void UserInputEventListener::operator()()
 {
-    while (true) {
-        auto ch = Util::GetCharImmediately();
-        OnEventHappens(UserInputEvent::Create(ch));
-    }
+    // while (true) {
+    //     auto ch = Util::GetCharImmediately();
+    //     OnEventHappens(UserInputEvent::Create(ch));
+    // }
 }
 
 void TimerEventListener::operator()()

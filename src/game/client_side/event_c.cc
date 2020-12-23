@@ -51,38 +51,43 @@ std::shared_ptr<UserInputEvent> UserInputEvent::Create(char ch)
     return nullptr;
 }
 
-void UserInputEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> UserInputEvent::Process(std::shared_ptr<State> &state)
 {
     // default handler for UserInputEvent, do nothing
+    return nullptr;
 }
 
-void TimerEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> TimerEvent::Process(std::shared_ptr<State> &state)
 {
     std::cout << "time ticks" << std::endl;
+    return nullptr;
 }
 
 // -------------------- NetworkEvent ---------------------
-void DrawNetworkEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> DrawNetworkEvent::Process(std::shared_ptr<State> &state)
 {
     // state->mGameState.UpdateAfterDraw();
     // state->mPlayerStates[mDraw.userid()].UpdateAfterDraw(mDraw.number());
     std::cout << mDraw.userid() << " " << mDraw.number() << std::endl;
+    return nullptr;
 }
 
-void SkipNetworkEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> SkipNetworkEvent::Process(std::shared_ptr<State> &state)
 {
     state->mGameState.UpdateAfterSkip();
     state->mPlayerStates[mSkip.userid()].UpdateAfterSkip();
+    return nullptr;
 }
 
-void PlayNetworkEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> PlayNetworkEvent::Process(std::shared_ptr<State> &state)
 {
     Card card{mPlay.card()};
     state->mGameState.UpdateAfterPlay(card);
     state->mPlayerStates[mPlay.userid()].UpdateAfterPlay(card);
+    return nullptr;
 }
 
-void DrawRspNetworkEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> DrawRspNetworkEvent::Process(std::shared_ptr<State> &state)
 {
     auto &gameState = state->mGameState;
     assert(gameState.IsMyTurn());
@@ -102,44 +107,53 @@ void DrawRspNetworkEvent::Process(std::shared_ptr<State> &state)
     else {
         playerState.UpdateAfterDraw(number);
     }
+    return nullptr;
 }
 
-void UnoNetworkEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> UnoNetworkEvent::Process(std::shared_ptr<State> &state)
 {
+    return nullptr;
 }
 
-void CatchNetworkEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> CatchNetworkEvent::Process(std::shared_ptr<State> &state)
 {
+    return nullptr;
 }
 
-void DoubtNetworkEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> DoubtNetworkEvent::Process(std::shared_ptr<State> &state)
 {
+    return nullptr;
 }
 
-void DoubtRspNetworkEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> DoubtRspNetworkEvent::Process(std::shared_ptr<State> &state)
 {
+    return nullptr;
 }
 
 // -------------------- UserInputEvent ---------------------
-void CursorMoveLeftUserInputEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> CursorMoveLeftUserInputEvent::Process(std::shared_ptr<State> &state)
 {
-    
+    return nullptr;
 }
 
-void CursorMoveRightUserInputEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> CursorMoveRightUserInputEvent::Process(std::shared_ptr<State> &state)
 {    
+    return nullptr;
 }
 
-void PlayUserInputEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> PlayUserInputEvent::Process(std::shared_ptr<State> &state)
 {    
+    return nullptr;
 }
 
-void PassUserInputEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> PassUserInputEvent::Process(std::shared_ptr<State> &state)
 {    
+    return nullptr;
 }
 
-void QuitUserInputEvent::Process(std::shared_ptr<State> &state)
+std::shared_ptr<UserOperation> QuitUserInputEvent::Process(std::shared_ptr<State> &state)
 {    
+    return nullptr;
 }
 
 }}
