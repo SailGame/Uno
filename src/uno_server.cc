@@ -1,12 +1,14 @@
 #include <spdlog/spdlog.h>
 
-#include "game/server_side/game_manager_s.h"
+#include "common/game_manager.h"
+#include "game/state.h"
 
-using SailGame::Game::GameManager;
+using SailGame::Common::GameManager;
+using SailGame::Game::State;
 
 int main(int argc, char** argv) {
     spdlog::info("Hello, I'm Uno Server!");
-    GameManager gameManager;
+    GameManager<State> gameManager;
     gameManager.Start();
 
     return 0;

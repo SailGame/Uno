@@ -1,30 +1,18 @@
 #pragma once
 
-#include <variant>
-#include <type_traits>
+#include <memory>
 
-#include "../game/event.h"
 #include "types.h"
 
 namespace SailGame { namespace Common {
 
-using Game::Event;
-using Game::State;
-using Uno::UserOperation;
-using Uno::NotifyMsg;
-
 template<typename StateT>
 class StateMachine {
 public:
-    static_assert(std::is_same_v<StateT, State>);
-
-    StateMachine() : mState(std::make_shared<StateT>()) {}
-
-    MsgTypePtrs Transition(const std::shared_ptr<Event> &event) {
-        return event->Process(mState);
-    }
+    template<typename MsgT>
+    ProviderMsgPtrs Transition(const MsgT &event);
 
 private:
-    std::shared_ptr<StateT> mState;
+    std::unique_ptr<StateT> mState;
 };
 }}

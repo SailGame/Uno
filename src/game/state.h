@@ -1,7 +1,10 @@
 #pragma once
 
-#include "../card.h"
-#include "../config.h"
+#include <map>
+#include <vector>
+
+#include "card.h"
+#include "config.h"
 
 namespace SailGame { namespace Game {
 

@@ -3,42 +3,48 @@
 #include <memory>
 #include <thread>
 #include <string>
+#include <functional>
 #include <grpc/grpc.h>
 #include <grpcpp/channel.h>
 #include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 
-#include "hello.grpc.pb.h"
+// #include "hello.grpc.pb.h"
+#include <core/provider.pb.h>
+#include <core/core.grpc.pb.h>
 
 namespace SailGame { namespace Network {
 
-using grpc::Channel;
-using grpc::ClientContext;
-using grpc::ClientReader;
-using grpc::ClientReaderWriter;
-using grpc::ClientWriter;
-using grpc::Status;
-using Uno::NotifyMsg;
-using Uno::UnoService;
-using Uno::UserOperation;
+using ::grpc::Channel;
+using ::grpc::ClientContext;
+using ::grpc::ClientReader;
+using ::grpc::ClientReaderWriter;
+using ::grpc::ClientWriter;
+using ::grpc::Status;
+using ::Core::ProviderMsg;
+using ::Core::GameCore;
 
 class Client {
 public:
-    Client(const std::string &endpoint, 
-        const std::function<void(const NotifyMsg &)> &newMsgCallback);
+    using OnNewMsgT = std::function<void(const ProviderMsg &)>;
+
+public:
+    Client(const std::string &endpoint, const OnNewMsgT &newMsgCallback);
 
     void Connect();
 
-    void Send(const UserOperation &msg);
+    ProviderMsg Receive();
+
+    void Send(const ProviderMsg &msg);
 
 private:
-    std::function<void(const NotifyMsg &)> OnNewMsg;
+    OnNewMsgT OnNewMsg;
 
 private:
     std::shared_ptr<Channel> mChannel;
+    std::shared_ptr<GameCore::Stub> mStub;
     std::shared_ptr<ClientContext> mContext;
-    std::shared_ptr<ClientReaderWriter<UserOperation, NotifyMsg>> mStream;
-    std::unique_ptr<std::thread> mListenThread;
+    std::shared_ptr<ClientReaderWriter<ProviderMsg, ProviderMsg>> mStream;
 };
 }}

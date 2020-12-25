@@ -3,29 +3,46 @@
 #include <functional>
 #include <memory>
 #include <queue>
+#include <mutex>
 
-#include "../game/event.h"
+#include <core/provider.pb.h>
+
+#include "types.h"
 
 namespace SailGame { namespace Common {
 
-using Game::Event;
+using Core::ProviderMsg;
 
 class EventLoop {
 public:
-    EventLoop() {}
+    using OnEventProcessedT = std::function<void(const ProviderMsgPtr &)>;
 
-    void StartLoop();
+public:
+    EventLoop(const OnEventProcessedT& callback)
+        : OnEventProcessed(callback) {}
 
-    void AppendEvent(const std::shared_ptr<Event> &event);
+    void StartLoop() {
+        while (true) {
+            if (!mEventQueue.empty()) {
+                // std::cout << "[EventLoop] Process Event: " << int(mEventQueue.front()->mType) << std::endl;
+                OnEventProcessed(mEventQueue.front());
+                mEventQueue.pop();
+            }
+        }
+    }
 
-    void RegisterEventProcessedCallback(
-        const std::function<void(const std::shared_ptr<Event> &)> &callback);
+    void AppendEvent(const ProviderMsgPtr &event) {
+        // multiple threads may invoke this at the same time
+        std::lock_guard<std::mutex> lock(mMutex);
+        // std::cout << "[EventLoop] Append Event: " << int(event->mType) << std::endl;
+        mEventQueue.push(event);
+    }
     
 private:
-    std::function<void(const std::shared_ptr<Event> &)> OnEventProcessed;
+    OnEventProcessedT OnEventProcessed;
 
 private:
-    std::queue<std::shared_ptr<Event>> mEventQueue;
+    std::queue<ProviderMsgPtr> mEventQueue;
     std::mutex mMutex;
 };
 }}

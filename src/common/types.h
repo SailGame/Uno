@@ -3,16 +3,12 @@
 #include <variant>
 #include <memory>
 
-namespace Uno {
-struct UserOperation;
-struct NotifyMsg;
+namespace Core {
+struct ProviderMsg;
 }
 
 namespace SailGame { namespace Common {
 
-using UserOperationPtr = std::shared_ptr<Uno::UserOperation>;
-using NotifyMsgPtr = std::shared_ptr<Uno::NotifyMsg>;
-using MsgTypePtr = std::variant<UserOperationPtr, NotifyMsgPtr>;
-using MsgTypePtrs = std::vector<MsgTypePtr>;
-
+using ProviderMsgPtr = std::shared_ptr<Core::ProviderMsg>;
+using ProviderMsgPtrs = std::vector<ProviderMsgPtr>;
 }}
