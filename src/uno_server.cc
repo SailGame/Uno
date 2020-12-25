@@ -2,26 +2,21 @@
 
 #include "common/game_manager.h"
 #include "game/state.h"
+#include "game/msg_builder.h"
 
 using Core::ProviderMsg;
 using Core::RegisterArgs;
+using SailGame::Game::MsgBuilder;
 using SailGame::Common::GameManager;
-using SailGame::Game::State;
+using SailGame::Game::GlobalState;
 
 int main(int argc, char** argv) {
     spdlog::info("Hello, I'm Uno Server!");
-    GameManager<State> gameManager;
+    GameManager<GlobalState> gameManager;
     gameManager.Start();
 
-    ProviderMsg msg;
-    auto registerArgs = msg.mutable_registerargs();
-    registerArgs->set_id("uno");
-    registerArgs->set_gamename("UNO");
-    auto gameSettings = registerArgs->mutable_gamesetting();
-    gameSettings->set_minusers(2);
-    gameSettings->set_minusers(4);
-
-    gameManager.ProcessEvent(std::make_shared<ProviderMsg>(msg));
+    gameManager.ProcessEvent(
+        MsgBuilder::CreateRegisterArgs(0, "uno", "UNO", 4, 2));
 
     return 0;
 }
