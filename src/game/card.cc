@@ -24,6 +24,13 @@ void Handcards::Draw(const std::vector<Card> &cards)
     });
 }
 
+void Handcards::FillInitHandcards(const InitHandcardsT &initHandcards)
+{
+    for (const auto & card : initHandcards) {
+        Draw(card);
+    }
+}
+
 void Handcards::Erase(int index)
 {
     mCards.erase(std::next(mCards.begin(), index));
@@ -71,9 +78,9 @@ void Deck::Init()
     Shuffle();
 }
 
-std::vector<std::array<Card, 7>> Deck::DealInitHandCards(int playerNum)
+std::vector<InitHandcardsT> Deck::DealInitHandcards(int playerNum)
 {
-    std::vector<std::array<Card, 7>> initHandCards(playerNum);
+    std::vector<InitHandcardsT> initHandCards(playerNum);
     for (int card = 0; card < 7; card++) {
         for (int player = 0; player < playerNum; player++) {
             initHandCards[player][card] = Draw();

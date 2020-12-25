@@ -12,6 +12,10 @@ namespace SailGame { namespace Game {
 using ::Uno::CardColor;
 using ::Uno::CardText;
 
+struct Card;
+
+using InitHandcardsT = std::array<Card, 7>;
+
 struct Card {
     CardColor mColor;
     CardText mText;
@@ -21,6 +25,14 @@ struct Card {
     Card(const ::Uno::Card &card) : mColor(card.color()), mText(card.text()) {}
 
     Card(const Card &) = default;
+    Card &operator=(const Card &) = default;
+
+    ::Uno::Card ConvertToGrpcCard() const {
+        ::Uno::Card card;
+        card.set_color(mColor);
+        card.set_text(mText);
+        return card;
+    }
 
     bool operator<(const Card &rhs) const {
         return (mColor < rhs.mColor) || 
@@ -44,9 +56,13 @@ struct CardSet {
 
 class Handcards {
 public:
+    Handcards() = default;
+
     void Draw(Card card);
 
     void Draw(const std::vector<Card> &cards);
+
+    void FillInitHandcards(const InitHandcardsT &initHandcards);
 
     void Erase(int index);
 
@@ -125,7 +141,7 @@ public:
 
     void Init();
 
-    std::vector<std::array<Card, 7>> DealInitHandCards(int playerNum);
+    std::vector<InitHandcardsT> DealInitHandcards(int playerNum);
 
     Card Draw();
 
