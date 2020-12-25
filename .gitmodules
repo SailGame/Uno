@@ -1,3 +1,6 @@
 [submodule "lib/spdlog"]
 	path = lib/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "proto"]
+	path = proto
+	url = https://github.com/SailGame/proto.git

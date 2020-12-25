@@ -1,69 +1,58 @@
 #pragma once
 
-#include <thread>
-#include <type_traits>
-#include "../game/event.h"
+#include <string>
+#include <memory>
+#include <functional>
+#include <core/provider.pb.h>
 
-namespace SailGame { 
+#include "types.h"
+#include "../network/client.h"
 
-namespace Network {
-class Client;
-class Server;
-}
+namespace SailGame { namespace Common {
 
-namespace Common {
-
-using Game::Event;
-using Game::NetworkEvent;
 using Network::Client;
-using Network::Server;
-using Uno::UserOperation;
-using Uno::NotifyMsg;
+using Core::ProviderMsg;
 
-template<typename PeerT>
 class NetworkInterface {
 public:
-    NetworkInterface(const std::function<void(const std::shared_ptr<NetworkEvent> &)> &callback,
-        const std::string &serverAddr) 
-        : OnEventHappens(callback),
-        mPeer(std::make_unique<Client>(serverAddr, 
-            [this](const NotifyMsg &msg) { ProcessMsg(msg); }))
-    {
-        static_assert(std::is_same_v<PeerT, Client>);
-        mPeer->Connect();
+    using OnNewMsgT = std::function<void(const ProviderMsgPtr &)>;
+
+public:
+    NetworkInterface(const std::string &serverAddr, const OnNewMsgT &callback) 
+        : OnNewMsg(callback),
+        mClient(std::make_unique<Client>(serverAddr, 
+            [this](const ProviderMsg &msg) { ProcessMsg(msg); }))
+    {}
+
+    void AsyncListen() {
+        mClient->Connect();
+        /// XXX: remove this
+        // mStream->WritesDone();
+
+        auto listenFunc = [this] {
+            while (true) {
+                auto msg = mClient->Receive();
+                ProcessMsg(msg);
+            }
+        };
+
+        /// TODO: where to join the thread
+        mListenThread = std::make_unique<std::thread>(listenFunc);
     }
 
-    NetworkInterface(const std::function<void(const std::shared_ptr<NetworkEvent> &)> &callback,
-        int port) 
-        : OnEventHappens(callback),
-        mPeer(std::make_unique<Server>(port, 
-            [this](const UserOperation &msg) { ProcessMsg(msg); }))
-    {
-        static_assert(std::is_same_v<PeerT, Server>);
-        mPeer->Start();
+    void SendMsg(const ProviderMsg &msg) {
+        mClient->Send(msg);
     }
 
-    template<typename MsgT>
-    void SendMsg(const MsgT &msg) {
-        static_assert(std::is_same_v<PeerT, Client>);
-        mPeer->Send(msg);
-    }
-
-    template<typename MsgT>
-    void SendMsg(int playerIndex, const MsgT &msg) {
-        static_assert(std::is_same_v<PeerT, Server>);
-        mPeer->Send(playerIndex, msg);
-    }
-
-    template<typename MsgT>
-    void ProcessMsg(const MsgT &msg) {
-        OnEventHappens(NetworkEvent::Create(msg));
+    void ProcessMsg(const ProviderMsg &msg) {
+        OnNewMsg(std::make_shared<ProviderMsg>(msg));
     }
 
 private:
-    std::function<void(const std::shared_ptr<NetworkEvent> &)> OnEventHappens;
+    OnNewMsgT OnNewMsg;
 
 private:
-    std::unique_ptr<PeerT> mPeer;
+    std::unique_ptr<Client> mClient;
+    std::unique_ptr<std::thread> mListenThread;
 };
 }}
