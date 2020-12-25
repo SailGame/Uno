@@ -10,7 +10,9 @@ template<typename StateT>
 class StateMachine {
 public:
     template<typename MsgT>
-    ProviderMsgPtrs Transition(const MsgT &event);
+    ProviderMsgPtrs Transition(const MsgT &event) {
+        assert(false);
+    }
 
 private:
     std::unique_ptr<StateT> mState;
