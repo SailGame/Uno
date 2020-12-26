@@ -22,7 +22,7 @@ public:
             mEventLoop->AppendEvent(event);
         };
         mNetworkInterface = std::make_unique<NetworkInterface>(
-            "localhost:8080", eventHappensCallback);
+            "localhost:50051", eventHappensCallback);
 
         auto eventProcessedCallback = [this](const ProviderMsgPtr &event) {
             ProcessEvent(event);
@@ -30,8 +30,9 @@ public:
         mEventLoop = std::make_unique<EventLoop>(eventProcessedCallback);
     }
 
-    void Start() {
+    void StartWithRegisterArgs(const ProviderMsgPtr &msg) {
         mNetworkInterface->AsyncListen();
+        mNetworkInterface->SendMsg(*msg);
         mEventLoop->StartLoop();
     }
 
