@@ -46,6 +46,7 @@ TransitionFor(UserOperationArgs);
 
 TransitionFor(UserOperation);
 TransitionFor(Draw);
+TransitionFor(Skip);
 
 TransitionFor(ProviderMsg)
 {
@@ -100,7 +101,9 @@ TransitionFor(UserOperation)
     switch (msg.Operation_case()) {
         case UserOperation::OperationCase::kDraw:
             return Transition<Draw>(msg.draw());
-        /// TODO: handle other operations
+        case UserOperation::OperationCase::kSkip:
+            return Transition<Skip>(msg.skip());
+            /// TODO: handle other operations
     }
     assert(false);
     return {};
@@ -125,4 +128,19 @@ TransitionFor(Draw)
             MsgBuilder::CreateDraw(msg.number())));
     return msgs;
 }
+
+TransitionFor(Skip)
+{
+    auto roomId = mState->mCurrentRoomId;
+    auto userId = mState->mCurrentUserId;
+
+    ProviderMsgPtrs msgs;
+    msgs.push_back(
+        MsgBuilder::CreateNotifyMsgArgs(0, Core::ErrorNumber::OK, roomId, -userId,
+            MsgBuilder::CreateSkip()));
+    return msgs;
+}
+
+
+
 }}
