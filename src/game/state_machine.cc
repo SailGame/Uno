@@ -1,13 +1,13 @@
 #include <spdlog/spdlog.h>
 
+#include <core/provider.pb.h>
+#include <core/error.pb.h>
+#include <uno/uno.pb.h>
+
 #include "state.h"
 #include "msg_builder.h"
 #include "../common/state_machine.h"
 #include "../common/util.h"
-
-#include <core/provider.pb.h>
-#include <core/error.pb.h>
-#include <uno/uno.pb.h>
 
 namespace SailGame { namespace Common {
 

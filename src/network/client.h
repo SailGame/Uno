@@ -10,7 +10,6 @@
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 
-// #include "hello.grpc.pb.h"
 #include <core/provider.pb.h>
 #include <core/core.grpc.pb.h>
 
