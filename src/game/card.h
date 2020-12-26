@@ -66,6 +66,8 @@ public:
 
     void Erase(int index);
 
+    void Erase(Card card);
+
     int GetIndex(Card card) const;
 
     int GetIndexOfNewlyDrawn(const Handcards &handcardsBeforeDraw) const;

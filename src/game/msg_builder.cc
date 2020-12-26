@@ -49,19 +49,24 @@ NotifyMsg MsgBuilder::CreateGameStart(const InitHandcardsT &initHandcards,
     return notifyMsg;
 }
 
-NotifyMsg MsgBuilder::CreateDraw(int number)
+NotifyMsg MsgBuilder::CreateDraw(const Draw &draw)
 {
     NotifyMsg msg;
-    auto draw = msg.mutable_draw();
-    draw->set_number(number);
+    msg.mutable_draw()->CopyFrom(draw);
     return msg;
 }
 
-NotifyMsg MsgBuilder::CreateSkip()
+NotifyMsg MsgBuilder::CreateSkip(const Skip &skip)
 {
     NotifyMsg msg;
-    // invoke mutable_skip() will set it as the oneof field
-    msg.mutable_skip();
+    msg.mutable_skip()->CopyFrom(skip);
+    return msg;
+}
+
+NotifyMsg MsgBuilder::CreatePlay(const Play &play)
+{
+    NotifyMsg msg;
+    msg.mutable_play()->CopyFrom(play);
     return msg;
 }
 

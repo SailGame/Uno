@@ -36,6 +36,11 @@ void Handcards::Erase(int index)
     mCards.erase(std::next(mCards.begin(), index));
 }
 
+void Handcards::Erase(Card card)
+{
+    Erase(GetIndex(card));
+}
+
 int Handcards::GetIndex(Card card) const
 {
     auto it = mCards.find(card);

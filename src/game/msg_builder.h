@@ -11,6 +11,9 @@ namespace SailGame { namespace Game {
 
 using ::Uno::GameStart;
 using ::Uno::NotifyMsg;
+using ::Uno::Draw;
+using ::Uno::Skip;
+using ::Uno::Play;
 using Core::ErrorNumber;
 using Core::NotifyMsgArgs;
 using Core::ProviderMsg;
@@ -27,9 +30,11 @@ public:
     static NotifyMsg CreateGameStart(const InitHandcardsT &initHandcards, 
         Card flippedCard, int firstPlayer);
 
-    static NotifyMsg CreateDraw(int number);
+    static NotifyMsg CreateDraw(const Draw &draw);
 
-    static NotifyMsg CreateSkip();
+    static NotifyMsg CreateSkip(const Skip &skip);
+  
+    static NotifyMsg CreatePlay(const Play &play);
   
     static NotifyMsg CreateDrawRsp(const std::vector<Card> &cards);
 };
