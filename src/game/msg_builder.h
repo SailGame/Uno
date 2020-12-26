@@ -29,6 +29,8 @@ public:
 
     static NotifyMsg CreateDraw(int number);
 
+    static NotifyMsg CreateSkip();
+  
     static NotifyMsg CreateDrawRsp(const std::vector<Card> &cards);
 };
 }}

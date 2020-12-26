@@ -57,6 +57,14 @@ NotifyMsg MsgBuilder::CreateDraw(int number)
     return msg;
 }
 
+NotifyMsg MsgBuilder::CreateSkip()
+{
+    NotifyMsg msg;
+    // invoke mutable_skip() will set it as the oneof field
+    msg.mutable_skip();
+    return msg;
+}
+
 NotifyMsg MsgBuilder::CreateDrawRsp(const std::vector<Card> &cards)
 {
     NotifyMsg msg;
