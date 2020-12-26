@@ -38,14 +38,17 @@ public:
 
         /// TODO: where to join the thread
         mListenThread = std::make_unique<std::thread>(listenFunc);
+        spdlog::info("listen thread created");
     }
 
     void SendMsg(const ProviderMsg &msg) {
         mClient->Send(msg);
+        spdlog::info("msg sent, type = {}", msg.Msg_case());
     }
 
     void ProcessMsg(const ProviderMsg &msg) {
         OnNewMsg(std::make_shared<ProviderMsg>(msg));
+        spdlog::info("msg received, type = {}", msg.Msg_case());
     }
 
 private:

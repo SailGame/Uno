@@ -12,6 +12,7 @@ Client::Client(const std::string &endpoint, const OnNewMsgT &newMsgCallback)
 void Client::Connect()
 {
     mStream = mStub->Provider(mContext.get());
+    spdlog::info("connection established.");
 }
 
 ProviderMsg Client::Receive()
@@ -21,7 +22,7 @@ ProviderMsg Client::Receive()
         return msg;
     }
     if (!mStream->Finish().ok()) {
-        std::cout << "RouteChat rpc failed." << std::endl;
+        std::cout << "rpc failed." << std::endl;
         std::exit(-1);
     }
     assert(false);
