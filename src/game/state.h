@@ -50,6 +50,8 @@ public:
 
 public:
     std::map<int, GameState> mRoomIdToGameState;
+    int mCurrentRoomId{-1};
+    int mCurrentUserId{-1};
 };
 /// TODO: mapping from usedId to playerIndex should be managed in client side
 // std::map<int, int> mPlayerIndexToUserId;

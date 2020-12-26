@@ -37,15 +37,15 @@ using ::Uno::Exit;
     template<> \
     ProviderMsgPtrs StateMachine<GlobalState>::Transition<MsgT>(const MsgT &msg)
 
-#define ForwardDeclaration(MsgT) \
-    TransitionFor(MsgT);
-
 TransitionFor(ProviderMsg);
 TransitionFor(RegisterRet);
 TransitionFor(StartGameArgs);
 // TransitionFor(CloseGameArgs);
 // TransitionFor(QueryStateArgs);
-// TransitionFor(UserOperationArgs);
+TransitionFor(UserOperationArgs);
+
+TransitionFor(UserOperation);
+TransitionFor(Draw);
 
 TransitionFor(ProviderMsg)
 {
@@ -61,6 +61,7 @@ TransitionFor(ProviderMsg)
         case ProviderMsg::MsgCase::kUserOperationArgs:
             return Transition<UserOperationArgs>(msg.useroperationargs());
     }
+    assert(false);
     return {};
 }
 
@@ -82,9 +83,46 @@ TransitionFor(StartGameArgs)
     for (const auto &entry : userIdToInitHandcards) {
         msgs.push_back(
             MsgBuilder::CreateNotifyMsgArgs(0, Core::ErrorNumber::OK, msg.roomid(), entry.first,
-                MsgBuilder::CreateGameStart(entry.second, flippedCard, firstPlayer))
-        );
+                MsgBuilder::CreateGameStart(entry.second, flippedCard, firstPlayer)));
     }
+    return msgs;
+}
+
+TransitionFor(UserOperationArgs)
+{
+    mState->mCurrentRoomId = msg.roomid();
+    mState->mCurrentUserId = msg.userid();
+    return Transition(Util::UnpackGrpcAnyTo<UserOperation>(msg.custom()));
+}
+
+TransitionFor(UserOperation)
+{
+    switch (msg.Operation_case()) {
+        case UserOperation::OperationCase::kDraw:
+            return Transition<Draw>(msg.draw());
+        /// TODO: handle other operations
+    }
+    assert(false);
+    return {};
+}
+
+TransitionFor(Draw)
+{
+    auto roomId = mState->mCurrentRoomId;
+    auto userId = mState->mCurrentUserId;
+    auto &gameState = mState->mRoomIdToGameState.at(roomId);
+    auto cards = gameState.mDeck->Draw(msg.number());
+    gameState.mUserIdToPlayerState.at(userId).mHandcards->Draw(cards);
+
+    ProviderMsgPtrs msgs;
+    msgs.push_back(
+        MsgBuilder::CreateNotifyMsgArgs(0, Core::ErrorNumber::OK, roomId, userId,
+            MsgBuilder::CreateDrawRsp(cards)));
+    // broadcast msg doesn't need to include userId of the player who sent UserOperation.
+    // because in client side, it can be deduced from `mCurrentPlayer` in state machine
+    msgs.push_back(
+        MsgBuilder::CreateNotifyMsgArgs(0, Core::ErrorNumber::OK, roomId, -userId,
+            MsgBuilder::CreateDraw(msg.number())));
     return msgs;
 }
 }}
