@@ -26,6 +26,9 @@ public:
 
     static NotifyMsg CreateGameStart(const InitHandcardsT &initHandcards, 
         Card flippedCard, int firstPlayer);
-};
 
+    static NotifyMsg CreateDraw(int number);
+
+    static NotifyMsg CreateDrawRsp(const std::vector<Card> &cards);
+};
 }}

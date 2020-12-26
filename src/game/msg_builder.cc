@@ -49,4 +49,21 @@ NotifyMsg MsgBuilder::CreateGameStart(const InitHandcardsT &initHandcards,
     return notifyMsg;
 }
 
+NotifyMsg MsgBuilder::CreateDraw(int number)
+{
+    NotifyMsg msg;
+    auto draw = msg.mutable_draw();
+    draw->set_number(number);
+    return msg;
+}
+
+NotifyMsg MsgBuilder::CreateDrawRsp(const std::vector<Card> &cards)
+{
+    NotifyMsg msg;
+    auto drawRsp = msg.mutable_drawrsp();
+    for (auto card : cards) {
+        drawRsp->add_cards()->CopyFrom(card.ConvertToGrpcCard());
+    }
+    return msg;
+}
 }}
