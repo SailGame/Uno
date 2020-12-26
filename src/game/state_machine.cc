@@ -11,6 +11,7 @@
 
 namespace SailGame { namespace Common {
 
+using Game::Card;
 using Game::GlobalState;
 using Game::MsgBuilder;
 using Core::ProviderMsg;
@@ -47,6 +48,7 @@ TransitionFor(UserOperationArgs);
 TransitionFor(UserOperation);
 TransitionFor(Draw);
 TransitionFor(Skip);
+TransitionFor(Play);
 
 TransitionFor(ProviderMsg)
 {
@@ -103,6 +105,8 @@ TransitionFor(UserOperation)
             return Transition<Draw>(msg.draw());
         case UserOperation::OperationCase::kSkip:
             return Transition<Skip>(msg.skip());
+        case UserOperation::OperationCase::kPlay:
+            return Transition<Play>(msg.play());
             /// TODO: handle other operations
     }
     assert(false);
@@ -125,7 +129,7 @@ TransitionFor(Draw)
     // because in client side, it can be deduced from `mCurrentPlayer` in state machine
     msgs.push_back(
         MsgBuilder::CreateNotifyMsgArgs(0, Core::ErrorNumber::OK, roomId, -userId,
-            MsgBuilder::CreateDraw(msg.number())));
+            MsgBuilder::CreateDraw(msg)));
     return msgs;
 }
 
@@ -137,10 +141,23 @@ TransitionFor(Skip)
     ProviderMsgPtrs msgs;
     msgs.push_back(
         MsgBuilder::CreateNotifyMsgArgs(0, Core::ErrorNumber::OK, roomId, -userId,
-            MsgBuilder::CreateSkip()));
+            MsgBuilder::CreateSkip(msg)));
     return msgs;
 }
 
+TransitionFor(Play)
+{
+    auto roomId = mState->mCurrentRoomId;
+    auto userId = mState->mCurrentUserId;
+    auto &gameState = mState->mRoomIdToGameState.at(roomId);
+    auto card = Card{msg.card()};
+    gameState.mDiscardPile->Add(card);
+    gameState.mUserIdToPlayerState.at(userId).mHandcards->Erase(card);
 
-
+    ProviderMsgPtrs msgs;
+    msgs.push_back(
+        MsgBuilder::CreateNotifyMsgArgs(0, Core::ErrorNumber::OK, roomId, -userId,
+            MsgBuilder::CreatePlay(msg)));
+    return msgs;
+}
 }}
