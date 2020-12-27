@@ -1,4 +1,5 @@
 #include <spdlog/spdlog.h>
+#include <spdlog/fmt/ostr.h>
 
 #include "common/game_manager.h"
 #include "game/state.h"

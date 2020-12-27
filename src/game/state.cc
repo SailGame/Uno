@@ -51,6 +51,7 @@ GameState::GameStartInfo GameState::GameStart()
     }
 
     // step 3. choose the first player randomly
+    /// FIXME: choose userId instead of playerIndex
     std::srand(std::time(nullptr));
     unsigned int firstPlayer = std::rand() % mPlayerNum;
 
