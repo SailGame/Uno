@@ -20,7 +20,7 @@ ProviderMsgPtr MsgBuilder::CreateRegisterArgs(int seqId, const std::string &id,
 }
 
 ProviderMsgPtr MsgBuilder::CreateNotifyMsgArgs(int seqId, ErrorNumber err, 
-    int roomId, int userId, NotifyMsg custom) 
+    int roomId, int userId, const NotifyMsg &custom) 
 {
     auto msg = std::make_shared<ProviderMsg>();
     msg->set_sequenceid(seqId);

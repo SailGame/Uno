@@ -13,14 +13,15 @@ namespace SailGame { namespace Common {
 using Network::Client;
 using Core::ProviderMsg;
 
+class NetworkInterfaceSubscriber {
+public:
+    virtual void OnEventHappens(const ProviderMsgPtr &) = 0;
+};
+
 class NetworkInterface {
 public:
-    using OnNewMsgT = std::function<void(const ProviderMsgPtr &)>;
-
-public:
-    NetworkInterface(const std::string &serverAddr, const OnNewMsgT &callback) 
-        : OnNewMsg(callback),
-        mClient(serverAddr, [this](const ProviderMsg &msg) { ProcessMsg(msg); })
+    NetworkInterface(const std::string &serverAddr) 
+        : mClient(serverAddr, [this](const ProviderMsg &msg) { ProcessMsg(msg); })
     {}
 
     void AsyncListen() {
@@ -46,15 +47,17 @@ public:
     }
 
     void ProcessMsg(const ProviderMsg &msg) {
-        OnNewMsg(std::make_shared<ProviderMsg>(msg));
+        mSubscriber->OnEventHappens(std::make_shared<ProviderMsg>(msg));
         spdlog::info("msg received, type = {}", msg.Msg_case());
     }
 
-private:
-    OnNewMsgT OnNewMsg;
+    void SetSubscriber(NetworkInterfaceSubscriber *subscriber) {
+        mSubscriber = subscriber;
+    }
 
 private:
     Client mClient;
     std::unique_ptr<std::thread> mListenThread;
+    NetworkInterfaceSubscriber *mSubscriber{nullptr};
 };
 }}

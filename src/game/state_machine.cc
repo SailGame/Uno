@@ -78,7 +78,7 @@ TransitionFor(RegisterRet)
 
 TransitionFor(StartGameArgs)
 {
-    auto [userIdToInitHandcards, flippedCard, firstPlayer] = mState->NewGame(
+    auto [userIdToInitHandcards, flippedCard, firstPlayer] = mState.NewGame(
         msg.roomid(), Util::ConvertGrpcRepeatedFieldToVector(msg.userid()),
         Util::UnpackGrpcAnyTo<StartGameSettings>(msg.custom()));
 
@@ -93,8 +93,8 @@ TransitionFor(StartGameArgs)
 
 TransitionFor(UserOperationArgs)
 {
-    mState->mCurrentRoomId = msg.roomid();
-    mState->mCurrentUserId = msg.userid();
+    mState.mCurrentRoomId = msg.roomid();
+    mState.mCurrentUserId = msg.userid();
     return Transition(Util::UnpackGrpcAnyTo<UserOperation>(msg.custom()));
 }
 
@@ -115,9 +115,9 @@ TransitionFor(UserOperation)
 
 TransitionFor(Draw)
 {
-    auto roomId = mState->mCurrentRoomId;
-    auto userId = mState->mCurrentUserId;
-    auto &gameState = mState->mRoomIdToGameState.at(roomId);
+    auto roomId = mState.mCurrentRoomId;
+    auto userId = mState.mCurrentUserId;
+    auto &gameState = mState.mRoomIdToGameState.at(roomId);
     auto cards = gameState.mDeck.Draw(msg.number());
     gameState.mUserIdToPlayerState.at(userId).mHandcards.Draw(cards);
 
@@ -135,8 +135,8 @@ TransitionFor(Draw)
 
 TransitionFor(Skip)
 {
-    auto roomId = mState->mCurrentRoomId;
-    auto userId = mState->mCurrentUserId;
+    auto roomId = mState.mCurrentRoomId;
+    auto userId = mState.mCurrentUserId;
 
     ProviderMsgPtrs msgs;
     msgs.push_back(
@@ -147,9 +147,9 @@ TransitionFor(Skip)
 
 TransitionFor(Play)
 {
-    auto roomId = mState->mCurrentRoomId;
-    auto userId = mState->mCurrentUserId;
-    auto &gameState = mState->mRoomIdToGameState.at(roomId);
+    auto roomId = mState.mCurrentRoomId;
+    auto userId = mState.mCurrentUserId;
+    auto &gameState = mState.mRoomIdToGameState.at(roomId);
     auto card = Card{msg.card()};
     gameState.mDiscardPile.Add(card);
     gameState.mUserIdToPlayerState.at(userId).mHandcards.Erase(card);
