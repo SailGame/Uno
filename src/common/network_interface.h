@@ -20,18 +20,17 @@ public:
 public:
     NetworkInterface(const std::string &serverAddr, const OnNewMsgT &callback) 
         : OnNewMsg(callback),
-        mClient(std::make_unique<Client>(serverAddr, 
-            [this](const ProviderMsg &msg) { ProcessMsg(msg); }))
+        mClient(serverAddr, [this](const ProviderMsg &msg) { ProcessMsg(msg); })
     {}
 
     void AsyncListen() {
-        mClient->Connect();
+        mClient.Connect();
         /// XXX: remove this
         // mStream->WritesDone();
 
         auto listenFunc = [this] {
             while (true) {
-                auto msg = mClient->Receive();
+                auto msg = mClient.Receive();
                 ProcessMsg(msg);
             }
         };
@@ -42,7 +41,7 @@ public:
     }
 
     void SendMsg(const ProviderMsg &msg) {
-        mClient->Send(msg);
+        mClient.Send(msg);
         spdlog::info("msg sent, type = {}", msg.Msg_case());
     }
 
@@ -55,7 +54,7 @@ private:
     OnNewMsgT OnNewMsg;
 
 private:
-    std::unique_ptr<Client> mClient;
+    Client mClient;
     std::unique_ptr<std::thread> mListenThread;
 };
 }}
