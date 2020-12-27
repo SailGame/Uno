@@ -13,19 +13,20 @@ namespace SailGame { namespace Common {
 
 using Core::ProviderMsg;
 
+class EventLoopSubscriber {
+public:
+    virtual void OnEventProcessed(const ProviderMsgPtr &) = 0;
+};
+
 class EventLoop {
 public:
-    using OnEventProcessedT = std::function<void(const ProviderMsgPtr &)>;
-
-public:
-    EventLoop(const OnEventProcessedT& callback)
-        : OnEventProcessed(callback) {}
+    EventLoop() = default;
 
     void StartLoop() {
         while (true) {
             if (!mEventQueue.empty()) {
                 // std::cout << "[EventLoop] Process Event: " << int(mEventQueue.front()->mType) << std::endl;
-                OnEventProcessed(mEventQueue.front());
+                mSubscriber->OnEventProcessed(mEventQueue.front());
                 mEventQueue.pop();
             }
         }
@@ -37,12 +38,14 @@ public:
         // std::cout << "[EventLoop] Append Event: " << int(event->mType) << std::endl;
         mEventQueue.push(event);
     }
-    
-private:
-    OnEventProcessedT OnEventProcessed;
+
+    void SetSubscriber(EventLoopSubscriber *subscriber) {
+        mSubscriber = subscriber;
+    }
 
 private:
     std::queue<ProviderMsgPtr> mEventQueue;
     std::mutex mMutex;
+    EventLoopSubscriber *mSubscriber{nullptr};
 };
 }}

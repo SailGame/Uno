@@ -13,39 +13,37 @@ namespace SailGame { namespace Common {
 using Core::ProviderMsg;
 
 template<typename StateT>
-class GameManager {
+class GameManager : 
+    public EventLoopSubscriber, 
+    public NetworkInterfaceSubscriber {
 public:
-    GameManager()
-        : mStateMachine(std::make_unique<StateMachine<StateT>>())
+    GameManager(const std::string &serverAddr)
+        : mNetworkInterface(serverAddr)
     {
-        auto eventHappensCallback = [this](const ProviderMsgPtr &event) {
-            mEventLoop->AppendEvent(event);
-        };
-        mNetworkInterface = std::make_unique<NetworkInterface>(
-            "localhost:50051", eventHappensCallback);
-
-        auto eventProcessedCallback = [this](const ProviderMsgPtr &event) {
-            ProcessEvent(event);
-        };
-        mEventLoop = std::make_unique<EventLoop>(eventProcessedCallback);
+        mEventLoop.SetSubscriber(this);
+        mNetworkInterface.SetSubscriber(this);
     }
 
     void StartWithRegisterArgs(const ProviderMsgPtr &msg) {
-        mNetworkInterface->AsyncListen();
-        mNetworkInterface->SendMsg(*msg);
-        mEventLoop->StartLoop();
+        mNetworkInterface.AsyncListen();
+        mNetworkInterface.SendMsg(*msg);
+        mEventLoop.StartLoop();
     }
 
-    void ProcessEvent(const ProviderMsgPtr &event) {
-        auto notifyMsgs = mStateMachine->Transition(*event);
+    void OnEventHappens(const ProviderMsgPtr &event) override {
+        mEventLoop.AppendEvent(event);
+    }
+
+    void OnEventProcessed(const ProviderMsgPtr &event) override {
+        auto notifyMsgs = mStateMachine.Transition(*event);
         for (const auto &msg : notifyMsgs) {
-            mNetworkInterface->SendMsg(*msg);
+            mNetworkInterface.SendMsg(*msg);
         }
     }
 
 private:
-    std::unique_ptr<EventLoop> mEventLoop;
-    std::unique_ptr<StateMachine<StateT>> mStateMachine;
-    std::unique_ptr<NetworkInterface> mNetworkInterface;
+    EventLoop mEventLoop;
+    StateMachine<StateT> mStateMachine;
+    NetworkInterface mNetworkInterface;
 };
 }}

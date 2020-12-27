@@ -25,7 +25,7 @@ public:
         const std::string &gameName, int maxUsers, int minUsers);
 
     static ProviderMsgPtr CreateNotifyMsgArgs(int seqId, ErrorNumber err, 
-        int roomId, int userId, NotifyMsg custom);
+        int roomId, int userId, const NotifyMsg &custom);
 
     static NotifyMsg CreateGameStart(const InitHandcardsT &initHandcards, 
         Card flippedCard, int firstPlayer);

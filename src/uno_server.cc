@@ -13,7 +13,7 @@ using SailGame::Game::GlobalState;
 
 int main(int argc, char** argv) {
     spdlog::info("Hello, I'm Uno Server!");
-    GameManager<GlobalState> gameManager;
+    GameManager<GlobalState> gameManager("localhost:50051");
     gameManager.StartWithRegisterArgs(
         MsgBuilder::CreateRegisterArgs(0, "uno", "UNO", 4, 2));
 

@@ -9,7 +9,7 @@ namespace SailGame { namespace Common {
 template<typename StateT>
 class StateMachine {
 public:
-    StateMachine() : mState(std::make_unique<StateT>()) {}
+    StateMachine() = default;
 
     template<typename MsgT>
     ProviderMsgPtrs Transition(const MsgT &event) {
@@ -17,6 +17,6 @@ public:
     }
 
 private:
-    std::unique_ptr<StateT> mState;
+    StateT mState;
 };
 }}
