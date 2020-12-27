@@ -25,7 +25,8 @@ ProviderMsg Client::Receive()
         std::cout << "rpc failed." << std::endl;
         std::exit(-1);
     }
-    assert(false);
+    auto error_msg = "Stream ends normally, which indicates error in core side.";
+    throw std::runtime_error(error_msg);
     return msg;
 }
 
