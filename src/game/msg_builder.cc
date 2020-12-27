@@ -5,10 +5,10 @@ namespace SailGame { namespace Game {
 ProviderMsgPtr MsgBuilder::CreateRegisterArgs(int seqId, const std::string &id,
     const std::string gameName, int maxUsers, int minUsers)
 {
-    ProviderMsg msg;
-    msg.set_sequenceid(seqId);
+    auto msg = std::make_shared<ProviderMsg>();
+    msg->set_sequenceid(seqId);
 
-    auto registerArgs = msg.mutable_registerargs();
+    auto registerArgs = msg->mutable_registerargs();
     registerArgs->set_id(id);
     registerArgs->set_gamename(gameName);
 
@@ -16,22 +16,22 @@ ProviderMsgPtr MsgBuilder::CreateRegisterArgs(int seqId, const std::string &id,
     gameSettings->set_maxusers(maxUsers);
     gameSettings->set_minusers(minUsers);
 
-    return std::make_shared<ProviderMsg>(msg);
+    return msg;
 }
 
 ProviderMsgPtr MsgBuilder::CreateNotifyMsgArgs(int seqId, ErrorNumber err, 
     int roomId, int userId, NotifyMsg custom) 
 {
-    ProviderMsg msg;
-    msg.set_sequenceid(seqId);
+    auto msg = std::make_shared<ProviderMsg>();
+    msg->set_sequenceid(seqId);
 
-    auto args = msg.mutable_notifymsgargs();
+    auto args = msg->mutable_notifymsgargs();
     args->set_err(err);
     args->set_roomid(roomId);
     args->set_userid(userId);
     args->mutable_custom()->PackFrom(custom);
 
-    return std::make_shared<ProviderMsg>(msg);
+    return msg;
 }
 
 NotifyMsg MsgBuilder::CreateGameStart(const InitHandcardsT &initHandcards, 

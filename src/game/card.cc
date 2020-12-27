@@ -74,8 +74,8 @@ void Deck::Init()
         }
     }
 
-    for (int i = 0; i < 4; i++) {
-        // there are four `wild` and `wild draw four` each
+    auto wildCardNum = 4;
+    for (int i = 0; i < wildCardNum; i++) {
         PushFront(CardColor::BLACK, CardText::WILD);
         PushFront(CardColor::BLACK, CardText::DRAW_FOUR);
     }
