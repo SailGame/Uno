@@ -13,7 +13,7 @@ public:
 
     template<typename MsgT>
     ProviderMsgPtrs Transition(const MsgT &event) {
-        assert(false);
+        throw std::runtime_error("Unsupported msg type");
     }
 
 private:

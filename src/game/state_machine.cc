@@ -64,7 +64,7 @@ TransitionFor(ProviderMsg)
         case ProviderMsg::MsgCase::kUserOperationArgs:
             return Transition<UserOperationArgs>(msg.useroperationargs());
     }
-    assert(false);
+    throw std::runtime_error("Unsupported msg type");
     return {};
 }
 
@@ -109,7 +109,7 @@ TransitionFor(UserOperation)
             return Transition<Play>(msg.play());
             /// TODO: handle other operations
     }
-    assert(false);
+    throw std::runtime_error("Unsupported msg type");
     return {};
 }
 
