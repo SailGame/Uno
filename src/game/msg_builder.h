@@ -22,7 +22,7 @@ using Common::ProviderMsgPtr;
 class MsgBuilder {
 public:
     static ProviderMsgPtr CreateRegisterArgs(int seqId, const std::string &id,
-        const std::string gameName, int maxUsers, int minUsers);
+        const std::string &gameName, int maxUsers, int minUsers);
 
     static ProviderMsgPtr CreateNotifyMsgArgs(int seqId, ErrorNumber err, 
         int roomId, int userId, NotifyMsg custom);

@@ -13,10 +13,10 @@ using ::Uno::StartGameSettings;
 
 class PlayerState {
 public:
-    PlayerState() : mHandcards(std::make_unique<Handcards>()) {}
+    PlayerState() = default;
 
 public:
-    std::unique_ptr<Handcards> mHandcards;
+    Handcards mHandcards;
 };
 
 class GameState {
@@ -35,10 +35,10 @@ public:
 
 public:
     int mPlayerNum;
-    std::unique_ptr<StartGameSettings> mGameSettings;
+    StartGameSettings mGameSettings;
+    DiscardPile mDiscardPile;
+    Deck mDeck{mDiscardPile};
     std::map<int, PlayerState> mUserIdToPlayerState;
-    std::unique_ptr<Deck> mDeck;
-    std::unique_ptr<DiscardPile> mDiscardPile;
 };
 
 class GlobalState {

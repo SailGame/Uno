@@ -3,7 +3,7 @@
 namespace SailGame { namespace Game {
 
 ProviderMsgPtr MsgBuilder::CreateRegisterArgs(int seqId, const std::string &id,
-    const std::string gameName, int maxUsers, int minUsers)
+    const std::string &gameName, int maxUsers, int minUsers)
 {
     auto msg = std::make_shared<ProviderMsg>();
     msg->set_sequenceid(seqId);

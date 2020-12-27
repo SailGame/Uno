@@ -118,8 +118,8 @@ TransitionFor(Draw)
     auto roomId = mState->mCurrentRoomId;
     auto userId = mState->mCurrentUserId;
     auto &gameState = mState->mRoomIdToGameState.at(roomId);
-    auto cards = gameState.mDeck->Draw(msg.number());
-    gameState.mUserIdToPlayerState.at(userId).mHandcards->Draw(cards);
+    auto cards = gameState.mDeck.Draw(msg.number());
+    gameState.mUserIdToPlayerState.at(userId).mHandcards.Draw(cards);
 
     ProviderMsgPtrs msgs;
     msgs.push_back(
@@ -151,8 +151,8 @@ TransitionFor(Play)
     auto userId = mState->mCurrentUserId;
     auto &gameState = mState->mRoomIdToGameState.at(roomId);
     auto card = Card{msg.card()};
-    gameState.mDiscardPile->Add(card);
-    gameState.mUserIdToPlayerState.at(userId).mHandcards->Erase(card);
+    gameState.mDiscardPile.Add(card);
+    gameState.mUserIdToPlayerState.at(userId).mHandcards.Erase(card);
 
     ProviderMsgPtrs msgs;
     msgs.push_back(

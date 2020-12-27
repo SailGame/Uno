@@ -6,28 +6,24 @@ namespace SailGame { namespace Game {
 
 GameState::GameState(const std::vector<unsigned int> &userIds, 
     const StartGameSettings &gameSettings)
-    : mPlayerNum(userIds.size()),
-    mGameSettings(std::make_unique<StartGameSettings>(gameSettings))
+    : mPlayerNum(userIds.size()), mGameSettings(gameSettings)
 {
     for (auto userId : userIds) {
         mUserIdToPlayerState.emplace(userId, PlayerState{});
     }
 
-    mDiscardPile = std::make_unique<DiscardPile>();
-    mDeck = std::make_unique<Deck>(*mDiscardPile);
-    
-    mDeck->Init();
+    mDeck.Init();
 }
 
 GameState::GameStartInfo GameState::GameStart()
 {
     // step 1. deal init handcards
-    auto initHandcards = mDeck->DealInitHandcards(mPlayerNum);
+    auto initHandcards = mDeck.DealInitHandcards(mPlayerNum);
     std::map<unsigned int, InitHandcardsT> userIdToInitHandcards;
     auto cur = 0;
     for (auto &playerState : mUserIdToPlayerState) {
         auto userId = playerState.first;
-        playerState.second.mHandcards->FillInitHandcards(initHandcards[cur]);
+        playerState.second.mHandcards.FillInitHandcards(initHandcards[cur]);
         userIdToInitHandcards.emplace(userId, initHandcards[cur]);
         cur++;
     }
@@ -36,10 +32,10 @@ GameState::GameStartInfo GameState::GameStart()
     // step 2. flip a card
     Card flippedCard;
     while (true) {
-        flippedCard = mDeck->Draw();
+        flippedCard = mDeck.Draw();
         if (flippedCard.mColor == CardColor::BLACK) {
             // if the flipped card is a wild card, put it to under the deck and flip a new one
-            mDeck->PutToBottom(flippedCard);
+            mDeck.PutToBottom(flippedCard);
         }
         else {
             if (CardSet::DrawTexts.count(flippedCard.mText)) {
