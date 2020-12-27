@@ -52,6 +52,11 @@ public:
     int mCurrentRoomId{-1};
     int mCurrentUserId{-1};
 };
+
+std::ostream &operator<<(std::ostream &os, const PlayerState &playerState);
+std::ostream &operator<<(std::ostream &os, const GameState &gameState);
+std::ostream &operator<<(std::ostream &os, const GlobalState &globalState);
+
 /// TODO: mapping from usedId to playerIndex should be managed in client side
 // std::map<int, int> mPlayerIndexToUserId;
 
