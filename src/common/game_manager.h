@@ -17,45 +17,48 @@ class GameManager :
     public EventLoopSubscriber, 
     public NetworkInterfaceSubscriber {
 public:
-    GameManager(EventLoop &eventLoop, StateMachine<StateT> &stateMachine,
-        NetworkInterface &networkInterface)
+    GameManager(const std::shared_ptr<EventLoop> &eventLoop, 
+        const std::shared_ptr<StateMachine<StateT>> &stateMachine,
+        const std::shared_ptr<NetworkInterface> &networkInterface)
         : mEventLoop(eventLoop), mStateMachine(stateMachine),
         mNetworkInterface(networkInterface)
     {
-        mEventLoop.SetSubscriber(this);
-        mNetworkInterface.SetSubscriber(this);
+        mEventLoop->SetSubscriber(this);
+        mNetworkInterface->SetSubscriber(this);
     }
 
     void Start() {
-        mNetworkInterface.Connect();
-        mEventLoop.StartLoop();
+        mNetworkInterface->Connect();
+        mEventLoop->StartLoop();
     }
 
     void Stop() {
-        mEventLoop.StopLoop();
+        mEventLoop->StopLoop();
     }
 
+    bool HasEventToProcess() const { return !mEventLoop->Empty(); }
+
     void StartWithRegisterArgs(const ProviderMsgPtr &msg) {
-        mNetworkInterface.AsyncListen();
-        mNetworkInterface.SendMsg(*msg);
-        mEventLoop.StartLoop();
+        mNetworkInterface->AsyncListen();
+        mNetworkInterface->SendMsg(*msg);
+        mEventLoop->StartLoop();
     }
 
     void OnEventHappens(const ProviderMsgPtr &event) override {
-        mEventLoop.AppendEvent(event);
+        mEventLoop->AppendEvent(event);
     }
 
     void OnEventProcessed(const ProviderMsgPtr &event) override {
-        auto notifyMsgs = mStateMachine.Transition(*event);
+        auto notifyMsgs = mStateMachine->Transition(*event);
         for (const auto &msg : notifyMsgs) {
-            mNetworkInterface.SendMsg(*msg);
+            mNetworkInterface->SendMsg(*msg);
         }
     }
 
 
 private:
-    EventLoop &mEventLoop;
-    StateMachine<StateT> &mStateMachine;
-    NetworkInterface &mNetworkInterface;
+    std::shared_ptr<EventLoop> mEventLoop;
+    std::shared_ptr<StateMachine<StateT>> mStateMachine;
+    std::shared_ptr<NetworkInterface> mNetworkInterface;
 };
 }}

@@ -33,15 +33,17 @@ public:
 
 class NetworkInterface {
 public:
-    static GameCore::StubInterface &CreateStub(const std::string &endpoint) {
+    NetworkInterface(GameCore::StubInterface &stub) 
+        : mStub(stub)
+    {}
+
+    static std::unique_ptr<GameCore::StubInterface> CreateStub(const std::string &endpoint) {
         auto channel = grpc::CreateChannel(endpoint, grpc::InsecureChannelCredentials());
-        static auto stub = GameCore::NewStub(channel);
-        return *stub;
+        return GameCore::NewStub(channel);
     }
 
-    static NetworkInterface &Create(GameCore::StubInterface &stub) {
-        static NetworkInterface networkInterface(stub);
-        return networkInterface;
+    static std::shared_ptr<NetworkInterface> Create(GameCore::StubInterface &stub) {
+        return std::make_shared<NetworkInterface>(stub);
     }
 
     void Connect() {
@@ -59,9 +61,7 @@ public:
 
         auto listenFunc = [this] {
             while (true) {
-                auto msg = ReceiveMsg();
-                mSubscriber->OnEventHappens(std::make_shared<ProviderMsg>(msg));
-                spdlog::info("msg received, type = {}", msg.Msg_case());
+                OnEventHappens(ReceiveMsg());
             }
         };
 
@@ -90,14 +90,14 @@ public:
         return msg;
     }
 
+    void OnEventHappens(const ProviderMsg &msg) {
+        mSubscriber->OnEventHappens(std::make_shared<ProviderMsg>(msg));
+        spdlog::info("msg received, type = {}", msg.Msg_case());
+    }
+
     void SetSubscriber(NetworkInterfaceSubscriber *subscriber) {
         mSubscriber = subscriber;
     }
-
-private:
-    NetworkInterface(GameCore::StubInterface &stub) 
-        : mStub(stub)
-    {}
 
 private:
     ClientContext mContext;
