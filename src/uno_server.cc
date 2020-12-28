@@ -18,11 +18,11 @@ int main(int argc, char** argv) {
     spdlog::info("Hello, I'm Uno Server!");
 
     std::string endpoint = "localhost:50051";
-    auto &stub = NetworkInterface::CreateStub(endpoint);
+    auto stub = NetworkInterface::CreateStub(endpoint);
     GameManager<GlobalState> gameManager(
         EventLoop::Create(),
         StateMachine<GlobalState>::Create(),
-        NetworkInterface::Create(stub));
+        NetworkInterface::Create(*stub));
         
     gameManager.StartWithRegisterArgs(
         MsgBuilder::CreateRegisterArgs(0, "uno", "UNO", 4, 2));

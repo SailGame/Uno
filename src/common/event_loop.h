@@ -20,9 +20,10 @@ public:
 
 class EventLoop {
 public:
-    static EventLoop &Create() {
-        static EventLoop eventLoop;
-        return eventLoop;
+    EventLoop() = default;
+
+    static std::shared_ptr<EventLoop> Create() {
+        return std::make_shared<EventLoop>();
     }
 
     void StartLoop() {
@@ -46,12 +47,11 @@ public:
         mEventQueue.push(event);
     }
 
+    bool Empty() const { return mEventQueue.empty(); }
+
     void SetSubscriber(EventLoopSubscriber *subscriber) {
         mSubscriber = subscriber;
     }
-
-private:
-    EventLoop() = default;
 
 private:
     std::queue<ProviderMsgPtr> mEventQueue;

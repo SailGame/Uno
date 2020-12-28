@@ -19,6 +19,17 @@ ProviderMsgPtr MsgBuilder::CreateRegisterArgs(int seqId, const std::string &id,
     return msg;
 }
 
+ProviderMsgPtr MsgBuilder::CreateRegisterRet(int seqId, ErrorNumber err)
+{
+    auto msg = std::make_shared<ProviderMsg>();
+    msg->set_sequenceid(seqId);
+
+    auto ret = msg->mutable_registerret();
+    ret->set_err(err);
+
+    return msg;
+}
+
 ProviderMsgPtr MsgBuilder::CreateNotifyMsgArgs(int seqId, ErrorNumber err, 
     int roomId, int userId, const NotifyMsg &custom) 
 {

@@ -39,7 +39,7 @@ public:
             mGameManager.Start();
         });
 
-        while (!mNetworkInterface.IsConnected()) {}
+        while (!mNetworkInterface->IsConnected()) {}
     }
 
     void TearDown() {
@@ -47,17 +47,32 @@ public:
         mThread->join();
     }
 
-public:
+    void ProcessMsg(const ProviderMsg &msg) {
+        EXPECT_CALL(*mMockStream, Read(_)).Times(1).WillOnce(
+            DoAll(SetArgPointee<0>(msg), Return(true)));
+        mNetworkInterface->OnEventHappens(mNetworkInterface->ReceiveMsg());
+
+        while (mGameManager.HasEventToProcess()) {}
+    }
+
+protected:
     MockClientReaderWriter<ProviderMsg, ProviderMsg> *mMockStream;
     MockGameCoreStub mMockStub;
-    NetworkInterface &mNetworkInterface;
+    std::shared_ptr<NetworkInterface> mNetworkInterface;
     GameManager<GlobalState> mGameManager;
     std::unique_ptr<std::thread> mThread;
 };
 
 TEST_F(MockCoreFixture, Register) {
     EXPECT_CALL(*mMockStream, Write(_, _)).Times(1);
-    mNetworkInterface.SendMsg(
+    mNetworkInterface->SendMsg(
         *MsgBuilder::CreateRegisterArgs(0, "uno", "UNO", 4, 2));
+
+    ProcessMsg(*MsgBuilder::CreateRegisterRet(0, ErrorNumber::OK));
 }
+
+TEST_F(MockCoreFixture, GameStart) {
+
+}
+
 }}
