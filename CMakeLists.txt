@@ -77,7 +77,7 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 add_custom_command(
     OUTPUT ${proto_srcs} ${proto_hdrs} ${grpc_srcs} ${grpc_hdrs}
     COMMAND ${_PROTOBUF_PROTOC}
-    ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
+    ARGS --grpc_out=generate_mock_code=true:"${CMAKE_CURRENT_BINARY_DIR}"
     --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
     # -I "${core_proto_dir}"
     # -I "${uno_proto_dir}"
@@ -92,13 +92,6 @@ set_source_files_properties(${proto_srcs} ${grpc_srcs} PROPERTIES GENERATED TRUE
 add_library(uno_proto_lib ${proto_srcs} ${grpc_srcs})
 target_link_libraries(uno_proto_lib ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
 
-
-# a mock server
-# add_executable(hello_server hello_server.cc)
-# target_link_libraries(hello_server hello_proto_lib)
-
-# uno
 add_subdirectory(src)
-
-# lib
+add_subdirectory(test)
 add_subdirectory(lib)
