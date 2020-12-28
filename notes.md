@@ -18,3 +18,5 @@
   My workaround is to use `add_library` to build those outputs as a library and not include them in `add_executable`, instead, link the library after `add_executable`. And the most important is to use `set_source_files_properties(${files} PROPERTIES GENERATED TRUE)`.
 
 + when installing grpc from source code, use `cmake -DgRPC_BUILD_TESTS=ON` to build tests also. and in this process, I encountered an error that `C++11 or greater detected. Should be C++03.` (`third_party/benchmark/test/cxx03_test.cc`). my solution is to comment out that line.
+
++ if compiler cannot know yet whether a name is a template or not when parsing the code, we need to add `template` keywork manually (just like `typename` keyword). *[reference](https://stackoverflow.com/questions/610245/where-and-why-do-i-have-to-put-the-template-and-typename-keywords)*

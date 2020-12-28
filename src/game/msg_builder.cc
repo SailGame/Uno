@@ -30,6 +30,32 @@ ProviderMsgPtr MsgBuilder::CreateRegisterRet(int seqId, ErrorNumber err)
     return msg;
 }
 
+ProviderMsgPtr MsgBuilder::CreateStartGameArgs(int seqId, int roomId, 
+    const std::vector<unsigned int> userIds, const StartGameSettings &custom)
+{
+    auto msg = std::make_shared<ProviderMsg>();
+    msg->set_sequenceid(seqId);
+
+    auto args = msg->mutable_startgameargs();
+    args->set_roomid(roomId);
+    args->mutable_userid()->CopyFrom(Util::ConvertVectorToGrpcRepeatedField<unsigned int>(userIds));
+    args->mutable_custom()->PackFrom(custom);
+
+    return msg;
+}
+
+StartGameSettings MsgBuilder::CreateStartGameSettings(bool isDraw2Consumed,
+    bool canSkipRespond, bool hasWildSwapHandsCard, bool canDoubtDraw4, int roundTime)
+{
+    StartGameSettings settings;
+    settings.set_isdraw2consumed(isDraw2Consumed);
+    settings.set_canskiprespond(canSkipRespond);
+    settings.set_haswildswaphandscard(hasWildSwapHandsCard);
+    settings.set_candoubtdraw4(canDoubtDraw4);
+    settings.set_roundtime(roundTime);
+    return settings;
+}
+
 ProviderMsgPtr MsgBuilder::CreateNotifyMsgArgs(int seqId, ErrorNumber err, 
     int roomId, int userId, const NotifyMsg &custom) 
 {

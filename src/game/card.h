@@ -126,7 +126,7 @@ protected:
 
     bool Empty() const { return mPile.empty(); }
 
-private:
+protected:
     std::deque<Card> mPile;
 };
 
@@ -150,7 +150,9 @@ public:
     std::vector<Card> Draw(int number);
 
     void PutToBottom(Card card) { PushBack(card); }
-    
+
+    int Number() const { return mPile.size(); }
+
 private:
     // link a discard pile to deck. when the deck is exhausted, swap them
     DiscardPile &mDiscardPile;
