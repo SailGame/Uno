@@ -6,11 +6,13 @@
 
 #include "card.h"
 #include "../common/types.h"
+#include "../common/util.h"
 
 namespace SailGame { namespace Game {
 
 using ::Uno::GameStart;
 using ::Uno::NotifyMsg;
+using ::Uno::StartGameSettings;
 using ::Uno::Draw;
 using ::Uno::Skip;
 using ::Uno::Play;
@@ -18,6 +20,7 @@ using Core::ErrorNumber;
 using Core::NotifyMsgArgs;
 using Core::ProviderMsg;
 using Common::ProviderMsgPtr;
+using Common::Util;
 
 class MsgBuilder {
 public:
@@ -25,6 +28,12 @@ public:
         const std::string &gameName, int maxUsers, int minUsers);
 
     static ProviderMsgPtr CreateRegisterRet(int seqId, ErrorNumber err);
+
+    static ProviderMsgPtr CreateStartGameArgs(int seqId, int roomId, 
+        const std::vector<unsigned int> userIds, const StartGameSettings &custom);
+    
+    static StartGameSettings CreateStartGameSettings(bool isDraw2Consumed,
+        bool canSkipRespond, bool hasWildSwapHandsCard, bool canDoubtDraw4, int roundTime);
 
     static ProviderMsgPtr CreateNotifyMsgArgs(int seqId, ErrorNumber err, 
         int roomId, int userId, const NotifyMsg &custom);

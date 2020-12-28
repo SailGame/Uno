@@ -20,6 +20,8 @@ public:
         throw std::runtime_error("Unsupported msg type");
     }
 
+    const StateT &GetState() const { return mState; } 
+
 private:
     StateT mState;
 };

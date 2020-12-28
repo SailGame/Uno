@@ -25,6 +25,16 @@ public:
     }
 
     template<typename T>
+    static RepeatedField<T> ConvertVectorToGrpcRepeatedField(const std::vector<T> &v) {
+        static_assert(std::is_copy_constructible_v<T>);
+        RepeatedField<T> field;
+        for (const auto &element : v) {
+            field.Add(element);
+        }
+        return field;
+    }
+
+    template<typename T>
     static T UnpackGrpcAnyTo(const Any &any) {
         assert(any.Is<T>());
         T ret;

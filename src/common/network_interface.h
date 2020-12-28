@@ -33,21 +33,22 @@ public:
 
 class NetworkInterface {
 public:
-    NetworkInterface(GameCore::StubInterface &stub) 
+    NetworkInterface(const std::shared_ptr<GameCore::StubInterface> &stub) 
         : mStub(stub)
     {}
 
-    static std::unique_ptr<GameCore::StubInterface> CreateStub(const std::string &endpoint) {
+    static std::shared_ptr<GameCore::StubInterface> CreateStub(const std::string &endpoint) {
         auto channel = grpc::CreateChannel(endpoint, grpc::InsecureChannelCredentials());
         return GameCore::NewStub(channel);
     }
 
-    static std::shared_ptr<NetworkInterface> Create(GameCore::StubInterface &stub) {
+    static std::shared_ptr<NetworkInterface> Create(
+        const std::shared_ptr<GameCore::StubInterface> &stub) {
         return std::make_shared<NetworkInterface>(stub);
     }
 
     void Connect() {
-        mStream = mStub.Provider(&mContext);
+        mStream = mStub->Provider(&mContext);
     }
 
     bool IsConnected() const {
@@ -101,7 +102,7 @@ public:
 
 private:
     ClientContext mContext;
-    GameCore::StubInterface &mStub;
+    std::shared_ptr<GameCore::StubInterface> mStub;
     std::shared_ptr<ClientReaderWriterInterface<ProviderMsg, ProviderMsg>> mStream;
     std::unique_ptr<std::thread> mListenThread;
     NetworkInterfaceSubscriber *mSubscriber{nullptr};

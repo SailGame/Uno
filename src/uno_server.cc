@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
     GameManager<GlobalState> gameManager(
         EventLoop::Create(),
         StateMachine<GlobalState>::Create(),
-        NetworkInterface::Create(*stub));
+        NetworkInterface::Create(stub));
         
     gameManager.StartWithRegisterArgs(
         MsgBuilder::CreateRegisterArgs(0, "uno", "UNO", 4, 2));
