@@ -16,3 +16,5 @@
 + Output of `add_custom_command` can be used by `add_executable` in the same `CMakeLists.txt`. However, if `add_executable` in the sub-directory wants to use files outputted by `add_custom_command`, it will complain something like 'cannot find source file' during configure-time.
 
   My workaround is to use `add_library` to build those outputs as a library and not include them in `add_executable`, instead, link the library after `add_executable`. And the most important is to use `set_source_files_properties(${files} PROPERTIES GENERATED TRUE)`.
+
++ when installing grpc from source code, use `cmake -DgRPC_BUILD_TESTS=ON` to build tests also. and in this process, I encountered an error that `C++11 or greater detected. Should be C++03.` (`third_party/benchmark/test/cxx03_test.cc`). my solution is to comment out that line.
