@@ -20,16 +20,23 @@ public:
 
 class EventLoop {
 public:
-    EventLoop() = default;
+    static EventLoop &Create() {
+        static EventLoop eventLoop;
+        return eventLoop;
+    }
 
     void StartLoop() {
-        while (true) {
+        while (!mShouldStop) {
             if (!mEventQueue.empty()) {
                 // std::cout << "[EventLoop] Process Event: " << int(mEventQueue.front()->mType) << std::endl;
                 mSubscriber->OnEventProcessed(mEventQueue.front());
                 mEventQueue.pop();
             }
         }
+    }
+
+    void StopLoop() {
+        mShouldStop = true;
     }
 
     void AppendEvent(const ProviderMsgPtr &event) {
@@ -44,8 +51,12 @@ public:
     }
 
 private:
+    EventLoop() = default;
+
+private:
     std::queue<ProviderMsgPtr> mEventQueue;
     std::mutex mMutex;
     EventLoopSubscriber *mSubscriber{nullptr};
+    bool mShouldStop{false};
 };
 }}
