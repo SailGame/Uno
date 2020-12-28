@@ -17,11 +17,22 @@ class GameManager :
     public EventLoopSubscriber, 
     public NetworkInterfaceSubscriber {
 public:
-    GameManager(const std::string &serverAddr)
-        : mNetworkInterface(serverAddr)
+    GameManager(EventLoop &eventLoop, StateMachine<StateT> &stateMachine,
+        NetworkInterface &networkInterface)
+        : mEventLoop(eventLoop), mStateMachine(stateMachine),
+        mNetworkInterface(networkInterface)
     {
         mEventLoop.SetSubscriber(this);
         mNetworkInterface.SetSubscriber(this);
+    }
+
+    void Start() {
+        mNetworkInterface.Connect();
+        mEventLoop.StartLoop();
+    }
+
+    void Stop() {
+        mEventLoop.StopLoop();
     }
 
     void StartWithRegisterArgs(const ProviderMsgPtr &msg) {
@@ -41,9 +52,10 @@ public:
         }
     }
 
+
 private:
-    EventLoop mEventLoop;
-    StateMachine<StateT> mStateMachine;
-    NetworkInterface mNetworkInterface;
+    EventLoop &mEventLoop;
+    StateMachine<StateT> &mStateMachine;
+    NetworkInterface &mNetworkInterface;
 };
 }}
