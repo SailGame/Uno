@@ -39,9 +39,8 @@ NotifyMsg MsgBuilder::CreateGameStart(const InitHandcardsT &initHandcards,
 {
     NotifyMsg notifyMsg;
     auto gameStart = notifyMsg.mutable_gamestart();
-    for (auto i = 0; i < 7; i++) {
-        gameStart->add_inithandcards()->CopyFrom(
-            initHandcards[i].ConvertToGrpcCard());
+    for (auto card : initHandcards) {
+        gameStart->add_inithandcards()->CopyFrom(card.ConvertToGrpcCard());
     }
     gameStart->mutable_flippedcard()->CopyFrom(
         flippedCard.ConvertToGrpcCard());
