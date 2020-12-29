@@ -25,9 +25,12 @@ using Core::MockGameCoreStub;
 using Core::ProviderMsg;
 using Game::GlobalState;
 using Game::MsgBuilder;
+using Game::Card;
 using grpc::testing::MockClientReaderWriter;
 using ::Uno::GameStart;
 using ::Uno::NotifyMsg;
+using ::Uno::CardColor;
+using ::Uno::CardText;
 
 MATCHER_P3(NotifyMsgArgsMatcher, err, roomId, userId, "") {
     return arg.has_notifymsgargs() && arg.notifymsgargs().err() == err &&
@@ -54,6 +57,12 @@ MATCHER_P(DrawRspMatcher, number, "") {
 MATCHER(SkipMatcher, "") {
     auto msg = Util::UnpackGrpcAnyTo<NotifyMsg>(arg.notifymsgargs().custom());
     return msg.has_skip();
+}
+
+MATCHER_P2(PlayMatcher, card, color, "") {
+    auto msg = Util::UnpackGrpcAnyTo<NotifyMsg>(arg.notifymsgargs().custom());
+    return msg.has_play() && 
+        Card{msg.play().card()} == card && msg.play().nextcolor() == color;
 }
 
 class MockCoreFixture : public ::testing::Test {
@@ -158,6 +167,14 @@ TEST_F(MockCoreFixture, Draw) {
             DrawMatcher(drawNum)), _)).Times(1);
     ProcessMsgFromCore(*MsgBuilder::CreateUserOperationArgs(0, roomId,
         userIds[0], MsgBuilder::CreateDraw(drawNum)));
+
+    const auto &state = mStateMachine->GetState().mRoomIdToGameState.at(roomId);
+    auto cardsInDeck = 108 - 7 * userIds.size() - 1;
+    EXPECT_EQ(state.mDeck.Number(), cardsInDeck - 1);
+    EXPECT_EQ(state.mDiscardPile.Number(), 0);
+    EXPECT_EQ(state.mUserIdToPlayerState.at(userIds[0]).mHandcards.Number(), 8);
+    EXPECT_EQ(state.mUserIdToPlayerState.at(userIds[1]).mHandcards.Number(), 7);
+    EXPECT_EQ(state.mUserIdToPlayerState.at(userIds[2]).mHandcards.Number(), 7);
 }
 
 TEST_F(MockCoreFixture, Skip) {
@@ -170,6 +187,37 @@ TEST_F(MockCoreFixture, Skip) {
             SkipMatcher()), _)).Times(1);
     ProcessMsgFromCore(*MsgBuilder::CreateUserOperationArgs(0, roomId,
         userIds[1], MsgBuilder::CreateSkip()));
+
+    const auto &state = mStateMachine->GetState().mRoomIdToGameState.at(roomId);
+    auto cardsInDeck = 108 - 7 * userIds.size() - 1;
+    EXPECT_EQ(state.mDeck.Number(), cardsInDeck);
+    EXPECT_EQ(state.mDiscardPile.Number(), 0);
+    EXPECT_EQ(state.mUserIdToPlayerState.at(userIds[0]).mHandcards.Number(), 7);
+    EXPECT_EQ(state.mUserIdToPlayerState.at(userIds[1]).mHandcards.Number(), 7);
+    EXPECT_EQ(state.mUserIdToPlayerState.at(userIds[2]).mHandcards.Number(), 7);
+}
+
+TEST_F(MockCoreFixture, Play) {
+    auto roomId = 1002;
+    std::vector<unsigned int> userIds = {11, 22, 33};
+    RegisterAndGameStart(roomId, userIds);
+
+    const auto &state = mStateMachine->GetState().mRoomIdToGameState.at(roomId);
+    const auto &playerState = state.mUserIdToPlayerState.at(userIds[2]);
+    auto card = playerState.mHandcards.At(3);
+    CardColor color = card.mColor;
+    EXPECT_CALL(*mMockStream, Write(
+        AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, -userIds[2]),
+            PlayMatcher(card, color)), _)).Times(1);
+    ProcessMsgFromCore(*MsgBuilder::CreateUserOperationArgs(0, roomId,
+        userIds[2], MsgBuilder::CreatePlay(card, color)));
+    
+    auto cardsInDeck = 108 - 7 * userIds.size() - 1;
+    EXPECT_EQ(state.mDeck.Number(), cardsInDeck);
+    EXPECT_EQ(state.mDiscardPile.Number(), 1);
+    EXPECT_EQ(state.mUserIdToPlayerState.at(userIds[0]).mHandcards.Number(), 7);
+    EXPECT_EQ(state.mUserIdToPlayerState.at(userIds[1]).mHandcards.Number(), 7);
+    EXPECT_EQ(state.mUserIdToPlayerState.at(userIds[2]).mHandcards.Number(), 6);
 }
 
 }}

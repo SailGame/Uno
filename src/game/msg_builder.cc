@@ -135,6 +135,15 @@ NotifyMsg MsgBuilder::CreatePlay(const Play &play)
     return msg;
 }
 
+UserOperation MsgBuilder::CreatePlay(Card card, CardColor color)
+{
+    UserOperation msg;
+    auto play = msg.mutable_play();
+    play->mutable_card()->CopyFrom(card.ConvertToGrpcCard());
+    play->set_nextcolor(color);
+    return msg;
+}
+
 NotifyMsg MsgBuilder::CreateDrawRsp(const std::vector<Card> &cards)
 {
     NotifyMsg msg;

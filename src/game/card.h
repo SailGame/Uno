@@ -135,6 +135,8 @@ public:
     void Add(Card card) { PushFront(card); }
 
     void Clear() { CardPile::Clear(); }
+
+    int Number() const { return mPile.size(); }
 };
 
 class Deck : public CardPile {
