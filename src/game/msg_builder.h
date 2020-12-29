@@ -50,7 +50,9 @@ public:
     static UserOperation CreateDraw(int number);
 
     static NotifyMsg CreateSkip(const Skip &skip);
-  
+
+    static UserOperation CreateSkip();
+
     static NotifyMsg CreatePlay(const Play &play);
   
     static NotifyMsg CreateDrawRsp(const std::vector<Card> &cards);
