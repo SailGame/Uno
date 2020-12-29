@@ -41,6 +41,16 @@ MATCHER(GameStartMatcher, "") {
     return msg.has_gamestart();
 }
 
+MATCHER_P(DrawMatcher, number, "") {
+    auto msg = Util::UnpackGrpcAnyTo<NotifyMsg>(arg.notifymsgargs().custom());
+    return msg.has_draw() && msg.draw().number() == number;
+}
+
+MATCHER_P(DrawRspMatcher, number, "") {
+    auto msg = Util::UnpackGrpcAnyTo<NotifyMsg>(arg.notifymsgargs().custom());
+    return msg.has_drawrsp() && msg.drawrsp().cards_size() == number;
+}
+
 class MockCoreFixture : public ::testing::Test {
 public:
     MockCoreFixture()
@@ -52,7 +62,9 @@ public:
     {}
 
     void SetUp() {
-        EXPECT_CALL(*mMockStub, ProviderRaw(_)).Times(AtLeast(1)).WillOnce(Return(mMockStream));
+        spdlog::set_level(spdlog::level::err);
+        EXPECT_CALL(*mMockStub, ProviderRaw(_))
+            .Times(AtLeast(1)).WillOnce(Return(mMockStream));
         mThread = std::make_unique<std::thread>([&] {
             mGameManager.Start();
         });
@@ -73,7 +85,9 @@ public:
         while (mGameManager.HasEventToProcess()) {}
     }
 
-    void RegisterAndGameStart(int roomId, const std::vector<unsigned int> &userIds) {
+    void RegisterAndGameStart(int roomId, 
+        const std::vector<unsigned int> &userIds) 
+    {
         EXPECT_CALL(*mMockStream, Write(_, _)).Times(AtLeast(1));
         mNetworkInterface->SendMsg(
             *MsgBuilder::CreateRegisterArgs(0, "uno", "UNO", 4, 2));
@@ -81,25 +95,16 @@ public:
 
         /// TODO: check flippedCard and firstPlayerId with action
         EXPECT_CALL(*mMockStream, Write(
-            AllOf(
-                NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, userIds[0]),
-                GameStartMatcher()
-            ), _)
-        ).Times(1);
+            AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, userIds[0]),
+                GameStartMatcher()), _)).Times(1);
 
         EXPECT_CALL(*mMockStream, Write(
-            AllOf(
-                NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, userIds[1]),
-                GameStartMatcher()
-            ), _)
-        ).Times(1);
+            AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, userIds[1]),
+                GameStartMatcher()), _)).Times(1);
 
         EXPECT_CALL(*mMockStream, Write(
-            AllOf(
-                NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, userIds[2]),
-                GameStartMatcher()
-            ), _)
-        ).Times(1);
+            AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, userIds[2]),
+                GameStartMatcher()), _)).Times(1);
         
         ProcessMsgFromCore(*MsgBuilder::CreateStartGameArgs(0, roomId, userIds,
             MsgBuilder::CreateStartGameSettings(true, true, false, false, 15)));
@@ -121,7 +126,8 @@ TEST_F(MockCoreFixture, RegisterAndGameStart) {
 
     const auto &state = mStateMachine->GetState();
     EXPECT_EQ(state.mRoomIdToGameState.size(), 1);
-    EXPECT_NE(state.mRoomIdToGameState.find(roomId), state.mRoomIdToGameState.end());
+    EXPECT_NE(state.mRoomIdToGameState.find(roomId), 
+        state.mRoomIdToGameState.end());
     const auto &gameState = state.mRoomIdToGameState.at(roomId);
     EXPECT_EQ(gameState.mPlayerNum, userIds.size());
     EXPECT_EQ(gameState.mUserIdToPlayerState.size(), userIds.size());
@@ -131,6 +137,22 @@ TEST_F(MockCoreFixture, RegisterAndGameStart) {
     }
     auto cardsInDeck = 108 - 7 * userIds.size() - 1;
     EXPECT_EQ(gameState.mDeck.Number(), cardsInDeck);
+}
+
+TEST_F(MockCoreFixture, Draw) {
+    auto roomId = 1002;
+    std::vector<unsigned int> userIds = {11, 22, 33};
+    RegisterAndGameStart(roomId, userIds);
+
+    auto drawNum = 1;
+    EXPECT_CALL(*mMockStream, Write(
+        AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, userIds[0]),
+            DrawRspMatcher(drawNum)), _)).Times(1);
+    EXPECT_CALL(*mMockStream, Write(
+        AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, -userIds[0]),
+            DrawMatcher(drawNum)), _)).Times(1);
+    ProcessMsgFromCore(*MsgBuilder::CreateUserOperationArgs(0, roomId,
+        userIds[0], MsgBuilder::CreateDraw(drawNum)));
 }
 
 }}
