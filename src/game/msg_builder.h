@@ -12,6 +12,7 @@ namespace SailGame { namespace Game {
 
 using ::Uno::GameStart;
 using ::Uno::NotifyMsg;
+using ::Uno::UserOperation;
 using ::Uno::StartGameSettings;
 using ::Uno::Draw;
 using ::Uno::Skip;
@@ -38,10 +39,15 @@ public:
     static ProviderMsgPtr CreateNotifyMsgArgs(int seqId, ErrorNumber err, 
         int roomId, int userId, const NotifyMsg &custom);
 
+    static ProviderMsgPtr CreateUserOperationArgs(int seqId, int roomId,
+        int userId, const UserOperation &custom);
+
     static NotifyMsg CreateGameStart(const InitHandcardsT &initHandcards, 
         Card flippedCard, int firstPlayer);
 
     static NotifyMsg CreateDraw(const Draw &draw);
+
+    static UserOperation CreateDraw(int number);
 
     static NotifyMsg CreateSkip(const Skip &skip);
   
