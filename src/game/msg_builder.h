@@ -17,6 +17,7 @@ using ::Uno::StartGameSettings;
 using ::Uno::Draw;
 using ::Uno::Skip;
 using ::Uno::Play;
+using ::Uno::CardColor;
 using Core::ErrorNumber;
 using Core::NotifyMsgArgs;
 using Core::ProviderMsg;
@@ -54,7 +55,9 @@ public:
     static UserOperation CreateSkip();
 
     static NotifyMsg CreatePlay(const Play &play);
-  
+
+    static UserOperation CreatePlay(Card card, CardColor color);
+
     static NotifyMsg CreateDrawRsp(const std::vector<Card> &cards);
 };
 }}
