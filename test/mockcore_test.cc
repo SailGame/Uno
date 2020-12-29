@@ -51,6 +51,11 @@ MATCHER_P(DrawRspMatcher, number, "") {
     return msg.has_drawrsp() && msg.drawrsp().cards_size() == number;
 }
 
+MATCHER(SkipMatcher, "") {
+    auto msg = Util::UnpackGrpcAnyTo<NotifyMsg>(arg.notifymsgargs().custom());
+    return msg.has_skip();
+}
+
 class MockCoreFixture : public ::testing::Test {
 public:
     MockCoreFixture()
@@ -153,6 +158,18 @@ TEST_F(MockCoreFixture, Draw) {
             DrawMatcher(drawNum)), _)).Times(1);
     ProcessMsgFromCore(*MsgBuilder::CreateUserOperationArgs(0, roomId,
         userIds[0], MsgBuilder::CreateDraw(drawNum)));
+}
+
+TEST_F(MockCoreFixture, Skip) {
+    auto roomId = 1002;
+    std::vector<unsigned int> userIds = {11, 22, 33};
+    RegisterAndGameStart(roomId, userIds);
+
+    EXPECT_CALL(*mMockStream, Write(
+        AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, -userIds[1]),
+            SkipMatcher()), _)).Times(1);
+    ProcessMsgFromCore(*MsgBuilder::CreateUserOperationArgs(0, roomId,
+        userIds[1], MsgBuilder::CreateSkip()));
 }
 
 }}

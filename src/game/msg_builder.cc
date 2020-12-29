@@ -121,6 +121,13 @@ NotifyMsg MsgBuilder::CreateSkip(const Skip &skip)
     return msg;
 }
 
+UserOperation MsgBuilder::CreateSkip()
+{
+    UserOperation msg;
+    msg.mutable_skip();
+    return msg;
+}
+
 NotifyMsg MsgBuilder::CreatePlay(const Play &play)
 {
     NotifyMsg msg;
