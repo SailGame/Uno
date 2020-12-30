@@ -1,9 +1,10 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 
-#include "common/game_manager.h"
-#include "game/state.h"
-#include "game/msg_builder.h"
+#include <common/game_manager.h>
+#include <uno/msg_builder.h>
+
+#include "state.h"
 
 using Core::ProviderMsg;
 using Core::RegisterArgs;

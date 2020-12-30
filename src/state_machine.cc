@@ -4,10 +4,11 @@
 #include <core/error.pb.h>
 #include <uno/uno.pb.h>
 
+#include <common/state_machine.h>
+#include <common/util.h>
+#include <uno/msg_builder.h>
+
 #include "state.h"
-#include "msg_builder.h"
-#include "../common/state_machine.h"
-#include "../common/util.h"
 
 namespace SailGame { namespace Common {
 

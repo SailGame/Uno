@@ -5,7 +5,7 @@
 
 #include <uno/uno.pb.h>
 
-#include "card.h"
+#include <uno/card.h>
 
 namespace SailGame { namespace Game {
 

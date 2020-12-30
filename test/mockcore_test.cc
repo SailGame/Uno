@@ -6,11 +6,11 @@
 #include <core/error.pb.h>
 #include <uno/uno.pb.h>
 
-#include "../src/game/msg_builder.h"
-#include "../src/common/game_manager.h"
-#include "../src/game/state.h"
-#include "../src/game/msg_builder.h"
-#include "../src/common/util.h"
+#include <uno/msg_builder.h>
+#include <common/game_manager.h>
+#include <common/util.h>
+
+#include "../src/state.h"
 
 namespace SailGame { namespace Test {
 
