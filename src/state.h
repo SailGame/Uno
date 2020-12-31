@@ -3,9 +3,9 @@
 #include <map>
 #include <vector>
 
-#include <uno/uno.pb.h>
+#include <sailgame_pb/uno/uno.pb.h>
 
-#include <uno/card.h>
+#include <sailgame/uno/card.h>
 
 namespace SailGame { namespace Game {
 

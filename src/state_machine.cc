@@ -1,12 +1,12 @@
 #include <spdlog/spdlog.h>
 
-#include <core/provider.pb.h>
-#include <core/error.pb.h>
-#include <uno/uno.pb.h>
+#include <sailgame_pb/core/provider.pb.h>
+#include <sailgame_pb/core/error.pb.h>
+#include <sailgame_pb/uno/uno.pb.h>
 
-#include <common/state_machine.h>
-#include <common/util.h>
-#include <uno/msg_builder.h>
+#include <sailgame/common/state_machine.h>
+#include <sailgame/common/util.h>
+#include <sailgame/uno/msg_builder.h>
 
 #include "state.h"
 

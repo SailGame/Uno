@@ -1,8 +1,8 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 
-#include <common/game_manager.h>
-#include <uno/msg_builder.h>
+#include <sailgame/common/game_manager.h>
+#include <sailgame/uno/msg_builder.h>
 
 #include "state.h"
 

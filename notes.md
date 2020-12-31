@@ -20,3 +20,8 @@
 + when installing grpc from source code, use `cmake -DgRPC_BUILD_TESTS=ON` to build tests also. and in this process, I encountered an error that `C++11 or greater detected. Should be C++03.` (`third_party/benchmark/test/cxx03_test.cc`). my solution is to comment out that line.
 
 + if compiler cannot know yet whether a name is a template or not when parsing the code, we need to add `template` keywork manually (just like `typename` keyword). *[reference](https://stackoverflow.com/questions/610245/where-and-why-do-i-have-to-put-the-template-and-typename-keywords)*
+
++ add an indirect level under `include` dir with name of project to avoid potential name conflict:
+    ```c++
+    #include <sailgame/common/game_manager.h>
+    ```
