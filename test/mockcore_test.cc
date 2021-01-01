@@ -71,7 +71,7 @@ public:
         : mMockStream(new MockClientReaderWriter<ProviderMsg, ProviderMsg>()),
         mMockStub(std::make_shared<MockGameCoreStub>()),
         mStateMachine(std::make_shared<StateMachine<GlobalState>>()),
-        mNetworkInterface(NetworkInterface::Create(mMockStub)),
+        mNetworkInterface(NetworkInterface<true>::Create(mMockStub)),
         mGameManager(EventLoop::Create(), mStateMachine, mNetworkInterface)
     {}
 
@@ -103,7 +103,7 @@ public:
         const std::vector<unsigned int> &userIds) 
     {
         EXPECT_CALL(*mMockStream, Write(_, _)).Times(AtLeast(1));
-        mNetworkInterface->SendMsg(
+        mNetworkInterface->AsyncSendMsg(
             *MsgBuilder::CreateRegisterArgs(0, "uno", "UNO", 4, 2));
         ProcessMsgFromCore(*MsgBuilder::CreateRegisterRet(0, ErrorNumber::OK));
 
@@ -128,8 +128,8 @@ protected:
     MockClientReaderWriter<ProviderMsg, ProviderMsg> *mMockStream;
     std::shared_ptr<MockGameCoreStub> mMockStub;
     std::shared_ptr<StateMachine<GlobalState>> mStateMachine;
-    std::shared_ptr<NetworkInterface> mNetworkInterface;
-    GameManager<GlobalState> mGameManager;
+    std::shared_ptr<NetworkInterface<true>> mNetworkInterface;
+    GameManager<GlobalState, true> mGameManager;
     std::unique_ptr<std::thread> mThread;
 };
 

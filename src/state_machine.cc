@@ -37,7 +37,7 @@ using ::Uno::Exit;
 #define TransitionFor(MsgT) \
     template<> \
     template<> \
-    ProviderMsgPtrs StateMachine<GlobalState>::Transition<MsgT>(const MsgT &msg)
+    ProviderMsgPtrs StateMachine<GlobalState>::TransitionForProviderMsg<MsgT>(const MsgT &msg)
 
 TransitionFor(ProviderMsg);
 TransitionFor(RegisterRet);
@@ -55,15 +55,15 @@ TransitionFor(ProviderMsg)
 {
     switch (msg.Msg_case()) {
         case ProviderMsg::MsgCase::kRegisterRet:
-            return Transition<RegisterRet>(msg.registerret());
+            return TransitionForProviderMsg<RegisterRet>(msg.registerret());
         case ProviderMsg::MsgCase::kStartGameArgs:
-            return Transition<StartGameArgs>(msg.startgameargs());
+            return TransitionForProviderMsg<StartGameArgs>(msg.startgameargs());
         case ProviderMsg::MsgCase::kCloseGameArgs:
-            return Transition<CloseGameArgs>(msg.closegameargs());
+            return TransitionForProviderMsg<CloseGameArgs>(msg.closegameargs());
         case ProviderMsg::MsgCase::kQueryStateArgs:
-            return Transition<QueryStateArgs>(msg.querystateargs());
+            return TransitionForProviderMsg<QueryStateArgs>(msg.querystateargs());
         case ProviderMsg::MsgCase::kUserOperationArgs:
-            return Transition<UserOperationArgs>(msg.useroperationargs());
+            return TransitionForProviderMsg<UserOperationArgs>(msg.useroperationargs());
     }
     throw std::runtime_error("Unsupported msg type");
     return {};
@@ -96,18 +96,18 @@ TransitionFor(UserOperationArgs)
 {
     mState.mCurrentRoomId = msg.roomid();
     mState.mCurrentUserId = msg.userid();
-    return Transition(Util::UnpackGrpcAnyTo<UserOperation>(msg.custom()));
+    return TransitionForProviderMsg(Util::UnpackGrpcAnyTo<UserOperation>(msg.custom()));
 }
 
 TransitionFor(UserOperation)
 {
     switch (msg.Operation_case()) {
         case UserOperation::OperationCase::kDraw:
-            return Transition<Draw>(msg.draw());
+            return TransitionForProviderMsg<Draw>(msg.draw());
         case UserOperation::OperationCase::kSkip:
-            return Transition<Skip>(msg.skip());
+            return TransitionForProviderMsg<Skip>(msg.skip());
         case UserOperation::OperationCase::kPlay:
-            return Transition<Play>(msg.play());
+            return TransitionForProviderMsg<Play>(msg.play());
             /// TODO: handle other operations
     }
     throw std::runtime_error("Unsupported msg type");
