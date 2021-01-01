@@ -1,16 +1,16 @@
 #include <gtest/gtest.h>
 #include <grpcpp/test/mock_stream.h>
 
-#include <core/core_mock.grpc.pb.h>
-#include <core/provider.pb.h>
-#include <core/error.pb.h>
-#include <uno/uno.pb.h>
+#include <sailgame_pb/core/core_mock.grpc.pb.h>
+#include <sailgame_pb/core/provider.pb.h>
+#include <sailgame_pb/core/error.pb.h>
+#include <sailgame_pb/uno/uno.pb.h>
 
-#include "../src/game/msg_builder.h"
-#include "../src/common/game_manager.h"
-#include "../src/game/state.h"
-#include "../src/game/msg_builder.h"
-#include "../src/common/util.h"
+#include <sailgame/uno/msg_builder.h>
+#include <sailgame/common/game_manager.h>
+#include <sailgame/common/util.h>
+
+#include "../src/state.h"
 
 namespace SailGame { namespace Test {
 
