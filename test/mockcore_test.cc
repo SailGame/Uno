@@ -8,29 +8,33 @@
 
 #include <sailgame/uno/msg_builder.h>
 #include <sailgame/common/game_manager.h>
+#include <sailgame/common/provider_msg_builder.h>
 #include <sailgame/common/util.h>
 
 #include "../src/state.h"
+#include "../src/state_machine.h"
 
 namespace SailGame { namespace Test {
 
 using namespace testing;
 using Common::EventLoop;
 using Common::GameManager;
+using Common::IStateMachine;
 using Common::NetworkInterface;
-using Common::StateMachine;
+using Common::ProviderMsgBuilder;
 using Common::Util;
-using Core::ErrorNumber;
-using Core::MockGameCoreStub;
-using Core::ProviderMsg;
-using Game::GlobalState;
-using Game::MsgBuilder;
-using Game::Card;
+using ::Core::ErrorNumber;
+using ::Core::MockGameCoreStub;
+using ::Core::ProviderMsg;
 using grpc::testing::MockClientReaderWriter;
-using ::Uno::GameStart;
-using ::Uno::NotifyMsg;
+using SailGame::Uno::Card;
+using SailGame::Uno::GlobalState;
+using SailGame::Uno::MsgBuilder;
+using SailGame::Uno::StateMachine;
 using ::Uno::CardColor;
 using ::Uno::CardText;
+using ::Uno::GameStart;
+using ::Uno::NotifyMsg;
 
 MATCHER_P3(NotifyMsgArgsMatcher, err, roomId, userId, "") {
     return arg.has_notifymsgargs() && arg.notifymsgargs().err() == err &&
@@ -70,7 +74,7 @@ public:
     MockCoreFixture()
         : mMockStream(new MockClientReaderWriter<ProviderMsg, ProviderMsg>()),
         mMockStub(std::make_shared<MockGameCoreStub>()),
-        mStateMachine(std::make_shared<StateMachine<GlobalState>>()),
+        mStateMachine(std::make_shared<StateMachine>()),
         mNetworkInterface(NetworkInterface<true>::Create(mMockStub)),
         mGameManager(EventLoop::Create(), mStateMachine, mNetworkInterface)
     {}
@@ -104,8 +108,8 @@ public:
     {
         EXPECT_CALL(*mMockStream, Write(_, _)).Times(AtLeast(1));
         mNetworkInterface->AsyncSendMsg(
-            *MsgBuilder::CreateRegisterArgs(0, "uno", "UNO", 4, 2));
-        ProcessMsgFromCore(*MsgBuilder::CreateRegisterRet(0, ErrorNumber::OK));
+            ProviderMsgBuilder::CreateRegisterArgs(0, "uno", "UNO", 4, 2));
+        ProcessMsgFromCore(ProviderMsgBuilder::CreateRegisterRet(0, ErrorNumber::OK));
 
         /// TODO: check flippedCard and firstPlayerId with action
         EXPECT_CALL(*mMockStream, Write(
@@ -120,16 +124,16 @@ public:
             AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, userIds[2]),
                 GameStartMatcher()), _)).Times(1);
         
-        ProcessMsgFromCore(*MsgBuilder::CreateStartGameArgs(0, roomId, userIds,
+        ProcessMsgFromCore(ProviderMsgBuilder::CreateStartGameArgs(0, roomId, userIds,
             MsgBuilder::CreateStartGameSettings(true, true, false, false, 15)));
     }
 
 protected:
     MockClientReaderWriter<ProviderMsg, ProviderMsg> *mMockStream;
     std::shared_ptr<MockGameCoreStub> mMockStub;
-    std::shared_ptr<StateMachine<GlobalState>> mStateMachine;
+    std::shared_ptr<StateMachine> mStateMachine;
     std::shared_ptr<NetworkInterface<true>> mNetworkInterface;
-    GameManager<GlobalState, true> mGameManager;
+    GameManager<true> mGameManager;
     std::unique_ptr<std::thread> mThread;
 };
 
@@ -165,7 +169,7 @@ TEST_F(MockCoreFixture, Draw) {
     EXPECT_CALL(*mMockStream, Write(
         AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, -userIds[0]),
             DrawMatcher(drawNum)), _)).Times(1);
-    ProcessMsgFromCore(*MsgBuilder::CreateUserOperationArgs(0, roomId,
+    ProcessMsgFromCore(ProviderMsgBuilder::CreateUserOperationArgs(0, roomId,
         userIds[0], MsgBuilder::CreateDraw(drawNum)));
 
     const auto &state = mStateMachine->GetState().mRoomIdToGameState.at(roomId);
@@ -185,7 +189,7 @@ TEST_F(MockCoreFixture, Skip) {
     EXPECT_CALL(*mMockStream, Write(
         AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, -userIds[1]),
             SkipMatcher()), _)).Times(1);
-    ProcessMsgFromCore(*MsgBuilder::CreateUserOperationArgs(0, roomId,
+    ProcessMsgFromCore(ProviderMsgBuilder::CreateUserOperationArgs(0, roomId,
         userIds[1], MsgBuilder::CreateSkip()));
 
     const auto &state = mStateMachine->GetState().mRoomIdToGameState.at(roomId);
@@ -209,7 +213,7 @@ TEST_F(MockCoreFixture, Play) {
     EXPECT_CALL(*mMockStream, Write(
         AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, -userIds[2]),
             PlayMatcher(card, color)), _)).Times(1);
-    ProcessMsgFromCore(*MsgBuilder::CreateUserOperationArgs(0, roomId,
+    ProcessMsgFromCore(ProviderMsgBuilder::CreateUserOperationArgs(0, roomId,
         userIds[2], MsgBuilder::CreatePlay(card, color)));
     
     auto cardsInDeck = 108 - 7 * userIds.size() - 1;

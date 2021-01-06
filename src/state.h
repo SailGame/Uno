@@ -7,7 +7,7 @@
 
 #include <sailgame/uno/card.h>
 
-namespace SailGame { namespace Game {
+namespace SailGame { namespace Uno {
 
 using ::Uno::StartGameSettings;
 

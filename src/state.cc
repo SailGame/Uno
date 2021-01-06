@@ -2,7 +2,7 @@
 
 #include "state.h"
 
-namespace SailGame { namespace Game {
+namespace SailGame { namespace Uno {
 
 GameState::GameState(const std::vector<unsigned int> &userIds, 
     const StartGameSettings &gameSettings)
