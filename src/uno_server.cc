@@ -4,7 +4,6 @@
 #include <sailgame/common/game_manager.h>
 #include <sailgame/common/provider_msg_builder.h>
 
-#include "state.h"
 #include "state_machine.h"
 
 using Core::ProviderMsg;

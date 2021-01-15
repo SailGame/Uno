@@ -37,9 +37,9 @@ protected:
 
     virtual ProviderMsgs Transition(const StartGameArgs &msg) override;
 
-    // virtual ProviderMsgs Transition(const CloseGameArgs &msg) override;
+    virtual ProviderMsgs Transition(const CloseGameArgs &msg) override;
 
-    // virtual ProviderMsgs Transition(const QueryStateArgs &msg) override;
+    virtual ProviderMsgs Transition(const QueryStateArgs &msg) override;
 
     virtual ProviderMsgs Transition(const UserOperationArgs &msg) override;
 

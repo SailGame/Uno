@@ -35,6 +35,7 @@ using ::Uno::CardColor;
 using ::Uno::CardText;
 using ::Uno::GameStart;
 using ::Uno::NotifyMsg;
+using ::Uno::UserOperation;
 
 MATCHER_P3(NotifyMsgArgsMatcher, err, roomId, userId, "") {
     return arg.has_notifymsgargs() && arg.notifymsgargs().err() == err &&
@@ -80,7 +81,7 @@ public:
     {}
 
     void SetUp() {
-        spdlog::set_level(spdlog::level::err);
+        // spdlog::set_level(spdlog::level::err);
         EXPECT_CALL(*mMockStub, ProviderRaw(_))
             .Times(AtLeast(1)).WillOnce(Return(mMockStream));
         mThread = std::make_unique<std::thread>([&] {
@@ -167,10 +168,10 @@ TEST_F(MockCoreFixture, Draw) {
         AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, userIds[0]),
             DrawRspMatcher(drawNum)), _)).Times(1);
     EXPECT_CALL(*mMockStream, Write(
-        AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, -userIds[0]),
+        AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, 0),
             DrawMatcher(drawNum)), _)).Times(1);
     ProcessMsgFromCore(ProviderMsgBuilder::CreateUserOperationArgs(0, roomId,
-        userIds[0], MsgBuilder::CreateDraw(drawNum)));
+        userIds[0], MsgBuilder::CreateDraw<UserOperation>(drawNum)));
 
     const auto &state = mStateMachine->GetState().mRoomIdToGameState.at(roomId);
     auto cardsInDeck = 108 - 7 * userIds.size() - 1;
@@ -187,10 +188,10 @@ TEST_F(MockCoreFixture, Skip) {
     RegisterAndGameStart(roomId, userIds);
 
     EXPECT_CALL(*mMockStream, Write(
-        AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, -userIds[1]),
+        AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, 0),
             SkipMatcher()), _)).Times(1);
     ProcessMsgFromCore(ProviderMsgBuilder::CreateUserOperationArgs(0, roomId,
-        userIds[1], MsgBuilder::CreateSkip()));
+        userIds[1], MsgBuilder::CreateSkip<UserOperation>()));
 
     const auto &state = mStateMachine->GetState().mRoomIdToGameState.at(roomId);
     auto cardsInDeck = 108 - 7 * userIds.size() - 1;
@@ -211,10 +212,10 @@ TEST_F(MockCoreFixture, Play) {
     auto card = playerState.mHandcards.At(3);
     CardColor color = card.mColor;
     EXPECT_CALL(*mMockStream, Write(
-        AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, -userIds[2]),
+        AllOf(NotifyMsgArgsMatcher(ErrorNumber::OK, roomId, 0),
             PlayMatcher(card, color)), _)).Times(1);
     ProcessMsgFromCore(ProviderMsgBuilder::CreateUserOperationArgs(0, roomId,
-        userIds[2], MsgBuilder::CreatePlay(card, color)));
+        userIds[2], MsgBuilder::CreatePlay<UserOperation>(card, color)));
     
     auto cardsInDeck = 108 - 7 * userIds.size() - 1;
     EXPECT_EQ(state.mDeck.Number(), cardsInDeck);

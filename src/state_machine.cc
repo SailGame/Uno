@@ -47,6 +47,10 @@ ProviderMsgs StateMachine::Transition(const StartGameArgs &msg)
     return msgs;
 }
 
+ProviderMsgs StateMachine::Transition(const CloseGameArgs &msg) { return {}; }
+
+ProviderMsgs StateMachine::Transition(const QueryStateArgs &msg) { return {}; }
+
 ProviderMsgs StateMachine::Transition(const UserOperationArgs &msg)
 {
     mState.mCurrentRoomId = msg.roomid();
@@ -77,17 +81,17 @@ ProviderMsgs StateMachine::Transition(const Draw &msg)
     auto cards = gameState.mDeck.Draw(msg.number());
     gameState.mUserIdToPlayerState.at(userId).mHandcards.Draw(cards);
 
+    // broadcast msg doesn't need to include userId of the player who sent UserOperation.
+    // because in client side, it can be deduced from `mCurrentPlayer` in state machine
     ProviderMsgs msgs;
+    msgs.push_back(
+        ProviderMsgBuilder::CreateNotifyMsgArgs(
+            0, Core::ErrorNumber::OK, roomId, 0,
+            MsgBuilder::CreateDraw(msg)));
     msgs.push_back(
         ProviderMsgBuilder::CreateNotifyMsgArgs(
             0, Core::ErrorNumber::OK, roomId, userId,
             MsgBuilder::CreateDrawRsp(cards)));
-    // broadcast msg doesn't need to include userId of the player who sent UserOperation.
-    // because in client side, it can be deduced from `mCurrentPlayer` in state machine
-    msgs.push_back(
-        ProviderMsgBuilder::CreateNotifyMsgArgs(
-            0, Core::ErrorNumber::OK, roomId, -userId,
-            MsgBuilder::CreateDraw(msg)));
     return msgs;
 }
 
@@ -99,7 +103,7 @@ ProviderMsgs StateMachine::Transition(const Skip &msg)
     ProviderMsgs msgs;
     msgs.push_back(
         ProviderMsgBuilder::CreateNotifyMsgArgs(
-            0, Core::ErrorNumber::OK, roomId, -userId,
+            0, Core::ErrorNumber::OK, roomId, 0,
             MsgBuilder::CreateSkip(msg)));
     return msgs;
 }
@@ -116,7 +120,7 @@ ProviderMsgs StateMachine::Transition(const Play &msg)
     ProviderMsgs msgs;
     msgs.push_back(
         ProviderMsgBuilder::CreateNotifyMsgArgs(
-            0, Core::ErrorNumber::OK, roomId, -userId,
+            0, Core::ErrorNumber::OK, roomId, 0,
             MsgBuilder::CreatePlay(msg)));
     return msgs;
 }
