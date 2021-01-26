@@ -10,6 +10,7 @@
 #include <sailgame/uno/msg_builder.h>
 
 #include "state_machine.h"
+#include "logger.h"
 
 namespace SailGame { namespace Uno {
 
@@ -38,11 +39,12 @@ ProviderMsgs StateMachine::Transition(const StartGameArgs &msg)
 
     ProviderMsgs msgs;
     for (const auto &entry : userIdToInitHandcards) {
-        msgs.push_back(
-            ProviderMsgBuilder::CreateNotifyMsgArgs(
-                0, Core::ErrorNumber::OK, msg.roomid(), entry.first,
-                MsgBuilder::CreateGameStart(
-                    entry.second, flippedCard, firstPlayer)));
+        auto gameStart = MsgBuilder::CreateGameStart(
+            entry.second, flippedCard, firstPlayer);
+        auto msgToSend = ProviderMsgBuilder::CreateNotifyMsgArgs(
+            0, Core::ErrorNumber::OK, msg.roomid(), entry.first, gameStart);
+        Logger::Log(msgToSend);
+        msgs.push_back(msgToSend);
     }
     return msgs;
 }
@@ -75,6 +77,7 @@ ProviderMsgs StateMachine::Transition(const UserOperation &msg)
 
 ProviderMsgs StateMachine::Transition(const Draw &msg)
 {
+    Logger::Log(msg);
     auto roomId = mState.mCurrentRoomId;
     auto userId = mState.mCurrentUserId;
     auto &gameState = mState.mRoomIdToGameState.at(roomId);
@@ -97,6 +100,7 @@ ProviderMsgs StateMachine::Transition(const Draw &msg)
 
 ProviderMsgs StateMachine::Transition(const Skip &msg)
 {
+    Logger::Log(msg);
     auto roomId = mState.mCurrentRoomId;
     auto userId = mState.mCurrentUserId;
 
@@ -110,12 +114,18 @@ ProviderMsgs StateMachine::Transition(const Skip &msg)
 
 ProviderMsgs StateMachine::Transition(const Play &msg)
 {
+    Logger::Log(msg);
     auto roomId = mState.mCurrentRoomId;
     auto userId = mState.mCurrentUserId;
     auto &gameState = mState.mRoomIdToGameState.at(roomId);
     auto card = Card{msg.card()};
     gameState.mDiscardPile.Add(card);
     gameState.mUserIdToPlayerState.at(userId).mHandcards.Erase(card);
+
+    if (gameState.mUserIdToPlayerState.at(userId).mHandcards.Number() == 0) {
+        // game ends
+        /// TODO: close game
+    }
 
     ProviderMsgs msgs;
     msgs.push_back(

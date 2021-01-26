@@ -3,12 +3,13 @@
 #include <map>
 #include <vector>
 
-#include <sailgame_pb/uno/uno.pb.h>
-
 #include <sailgame/uno/card.h>
+#include <sailgame/common/state_machine.h>
+#include <sailgame_pb/uno/uno.pb.h>
 
 namespace SailGame { namespace Uno {
 
+using Common::IState;
 using ::Uno::StartGameSettings;
 
 class PlayerState {
@@ -41,7 +42,7 @@ public:
     std::map<int, PlayerState> mUserIdToPlayerState;
 };
 
-class GlobalState {
+class GlobalState : public IState {
 public:
     GameState::GameStartInfo NewGame(int roomId, 
         const std::vector<unsigned int> &userIds,

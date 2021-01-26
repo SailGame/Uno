@@ -18,9 +18,9 @@ namespace SailGame { namespace Test {
 
 using namespace testing;
 using Common::EventLoop;
-using Common::GameManager;
-using Common::IStateMachine;
-using Common::NetworkInterface;
+using Common::ProviderGameManager;
+using Common::ProviderStateMachine;
+using Common::ProviderNetworkInterface;
 using Common::ProviderMsgBuilder;
 using Common::Util;
 using ::Core::ErrorNumber;
@@ -31,6 +31,7 @@ using SailGame::Uno::Card;
 using SailGame::Uno::GlobalState;
 using SailGame::Uno::MsgBuilder;
 using SailGame::Uno::StateMachine;
+using SailGame::Uno::GlobalState;
 using ::Uno::CardColor;
 using ::Uno::CardText;
 using ::Uno::GameStart;
@@ -76,7 +77,7 @@ public:
         : mMockStream(new MockClientReaderWriter<ProviderMsg, ProviderMsg>()),
         mMockStub(std::make_shared<MockGameCoreStub>()),
         mStateMachine(std::make_shared<StateMachine>()),
-        mNetworkInterface(NetworkInterface<true>::Create(mMockStub)),
+        mNetworkInterface(ProviderNetworkInterface::Create(mMockStub)),
         mGameManager(EventLoop::Create(), mStateMachine, mNetworkInterface)
     {}
 
@@ -129,12 +130,16 @@ public:
             MsgBuilder::CreateStartGameSettings(true, true, false, false, 15)));
     }
 
+    GlobalState GetState() const {
+        return dynamic_cast<const GlobalState &>(mStateMachine->GetState());
+    }
+
 protected:
     MockClientReaderWriter<ProviderMsg, ProviderMsg> *mMockStream;
     std::shared_ptr<MockGameCoreStub> mMockStub;
-    std::shared_ptr<StateMachine> mStateMachine;
-    std::shared_ptr<NetworkInterface<true>> mNetworkInterface;
-    GameManager<true> mGameManager;
+    std::shared_ptr<ProviderStateMachine> mStateMachine;
+    std::shared_ptr<ProviderNetworkInterface> mNetworkInterface;
+    ProviderGameManager mGameManager;
     std::unique_ptr<std::thread> mThread;
 };
 
@@ -143,11 +148,11 @@ TEST_F(MockCoreFixture, RegisterAndGameStart) {
     std::vector<unsigned int> userIds = {11, 22, 33};
     RegisterAndGameStart(roomId, userIds);
 
-    const auto &state = mStateMachine->GetState();
-    EXPECT_EQ(state.mRoomIdToGameState.size(), 1);
-    EXPECT_NE(state.mRoomIdToGameState.find(roomId), 
-        state.mRoomIdToGameState.end());
-    const auto &gameState = state.mRoomIdToGameState.at(roomId);
+    // const auto &state = mStateMachine->GetState();
+    EXPECT_EQ(GetState().mRoomIdToGameState.size(), 1);
+    EXPECT_NE(GetState().mRoomIdToGameState.find(roomId), 
+        GetState().mRoomIdToGameState.end());
+    const auto &gameState = GetState().mRoomIdToGameState.at(roomId);
     EXPECT_EQ(gameState.mPlayerNum, userIds.size());
     EXPECT_EQ(gameState.mUserIdToPlayerState.size(), userIds.size());
     for (auto userId : userIds) {
@@ -173,7 +178,7 @@ TEST_F(MockCoreFixture, Draw) {
     ProcessMsgFromCore(ProviderMsgBuilder::CreateUserOperationArgs(0, roomId,
         userIds[0], MsgBuilder::CreateDraw<UserOperation>(drawNum)));
 
-    const auto &state = mStateMachine->GetState().mRoomIdToGameState.at(roomId);
+    const auto &state = GetState().mRoomIdToGameState.at(roomId);
     auto cardsInDeck = 108 - 7 * userIds.size() - 1;
     EXPECT_EQ(state.mDeck.Number(), cardsInDeck - 1);
     EXPECT_EQ(state.mDiscardPile.Number(), 0);
@@ -193,7 +198,7 @@ TEST_F(MockCoreFixture, Skip) {
     ProcessMsgFromCore(ProviderMsgBuilder::CreateUserOperationArgs(0, roomId,
         userIds[1], MsgBuilder::CreateSkip<UserOperation>()));
 
-    const auto &state = mStateMachine->GetState().mRoomIdToGameState.at(roomId);
+    const auto &state = GetState().mRoomIdToGameState.at(roomId);
     auto cardsInDeck = 108 - 7 * userIds.size() - 1;
     EXPECT_EQ(state.mDeck.Number(), cardsInDeck);
     EXPECT_EQ(state.mDiscardPile.Number(), 0);
@@ -207,8 +212,8 @@ TEST_F(MockCoreFixture, Play) {
     std::vector<unsigned int> userIds = {11, 22, 33};
     RegisterAndGameStart(roomId, userIds);
 
-    const auto &state = mStateMachine->GetState().mRoomIdToGameState.at(roomId);
-    const auto &playerState = state.mUserIdToPlayerState.at(userIds[2]);
+    const auto &playerState = GetState().mRoomIdToGameState.at(roomId)
+        .mUserIdToPlayerState.at(userIds[2]);
     auto card = playerState.mHandcards.At(3);
     CardColor color = card.mColor;
     EXPECT_CALL(*mMockStream, Write(
@@ -218,6 +223,7 @@ TEST_F(MockCoreFixture, Play) {
         userIds[2], MsgBuilder::CreatePlay<UserOperation>(card, color)));
     
     auto cardsInDeck = 108 - 7 * userIds.size() - 1;
+    const auto &state = GetState().mRoomIdToGameState.at(roomId);
     EXPECT_EQ(state.mDeck.Number(), cardsInDeck);
     EXPECT_EQ(state.mDiscardPile.Number(), 1);
     EXPECT_EQ(state.mUserIdToPlayerState.at(userIds[0]).mHandcards.Number(), 7);

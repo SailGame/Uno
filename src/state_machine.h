@@ -19,18 +19,19 @@ using ::Uno::Draw;
 using ::Uno::Skip;
 using ::Uno::Play;
 using ::Uno::UserOperation;
-using Common::IStateMachine;
+using Common::ProviderStateMachine;
 using Common::ProviderMsgs;
+using Common::IState;
 
-class StateMachine : public IStateMachine {
+class StateMachine : public ProviderStateMachine {
 public:
     StateMachine() = default;
 
-    static std::shared_ptr<IStateMachine> Create() {
+    static std::shared_ptr<ProviderStateMachine> Create() {
         return std::make_shared<StateMachine>();
     }
 
-    const GlobalState &GetState() { return mState; }
+    const IState &GetState() const override { return mState; }
 
 protected:
     virtual ProviderMsgs Transition(const RegisterRet &msg) override;
