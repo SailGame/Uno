@@ -2,7 +2,7 @@
 
 #include "state.h"
 
-namespace SailGame { namespace Game {
+namespace SailGame { namespace Uno {
 
 GameState::GameState(const std::vector<unsigned int> &userIds, 
     const StartGameSettings &gameSettings)
@@ -47,7 +47,6 @@ GameState::GameStartInfo GameState::GameStart()
     }
 
     // step 3. choose the first player randomly
-    /// FIXME: choose userId instead of playerIndex
     std::srand(std::time(nullptr));
     unsigned int firstPlayer = std::rand() % mPlayerNum;
 
