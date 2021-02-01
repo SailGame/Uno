@@ -9,7 +9,6 @@
 
 namespace SailGame { namespace Uno {
 
-using ::Core::CloseGameArgs;
 using ::Core::ProviderMsg;
 using ::Core::QueryStateArgs;
 using ::Core::RegisterRet;
@@ -37,8 +36,6 @@ protected:
     virtual ProviderMsgs Transition(const RegisterRet &msg) override;
 
     virtual ProviderMsgs Transition(const StartGameArgs &msg) override;
-
-    virtual ProviderMsgs Transition(const CloseGameArgs &msg) override;
 
     virtual ProviderMsgs Transition(const QueryStateArgs &msg) override;
 

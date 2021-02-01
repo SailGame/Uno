@@ -1,6 +1,6 @@
 # enable x.y version format
 cmake_policy(SET CMP0048 NEW)
-project(Uno VERSION 0.1)
+project(Uno VERSION 0.9.0)
 
 cmake_minimum_required(VERSION 3.14)
 

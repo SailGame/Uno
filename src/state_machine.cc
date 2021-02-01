@@ -33,6 +33,7 @@ ProviderMsgs StateMachine::Transition(const RegisterRet &msg)
 
 ProviderMsgs StateMachine::Transition(const StartGameArgs &msg)
 {
+    spdlog::info("Game Start!");
     auto [userIdToInitHandcards, flippedCard, firstPlayer] = mState.NewGame(
         msg.roomid(), Util::ConvertGrpcRepeatedFieldToVector(msg.userid()),
         Util::UnpackGrpcAnyTo<StartGameSettings>(msg.custom()));
@@ -48,8 +49,6 @@ ProviderMsgs StateMachine::Transition(const StartGameArgs &msg)
     }
     return msgs;
 }
-
-ProviderMsgs StateMachine::Transition(const CloseGameArgs &msg) { return {}; }
 
 ProviderMsgs StateMachine::Transition(const QueryStateArgs &msg) { return {}; }
 
@@ -122,16 +121,19 @@ ProviderMsgs StateMachine::Transition(const Play &msg)
     gameState.mDiscardPile.Add(card);
     gameState.mUserIdToPlayerState.at(userId).mHandcards.Erase(card);
 
-    if (gameState.mUserIdToPlayerState.at(userId).mHandcards.Number() == 0) {
-        // game ends
-        /// TODO: close game
-    }
-
     ProviderMsgs msgs;
     msgs.push_back(
         ProviderMsgBuilder::CreateNotifyMsgArgs(
             0, Core::ErrorNumber::OK, roomId, 0,
             MsgBuilder::CreatePlay(msg)));
+
+    if (gameState.mUserIdToPlayerState.at(userId).mHandcards.Number() == 0) {
+        // game ends
+        msgs.push_back(
+            ProviderMsgBuilder::CreateCloseGameArgs(0, roomId));
+        mState.mRoomIdToGameState.erase(roomId);
+        spdlog::info("GameOver!");
+    }
     return msgs;
 }
 }}

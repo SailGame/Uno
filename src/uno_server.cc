@@ -22,7 +22,9 @@ int main(int argc, char** argv) {
     spdlog::default_logger()->flush_on(spdlog::level::info);
     spdlog::info("Hello, I'm Uno Server!");
 
-    std::string endpoint = "localhost:50051";
+    std::string endpoint = argv[1];
+
+    // std::string endpoint = "localhost:50051";
     auto stub = ProviderNetworkInterface::CreateStub(endpoint);
     ProviderGameManager gameManager(
         EventLoop::Create(),
