@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-20.04, ubuntu-18.04]
+        os: [macos-latest, ubuntu-20.04, ubuntu-18.04, ubuntu-16.04]
     
     env:
       MY_INSTALL_DIR: ~/.local
@@ -66,8 +66,7 @@ jobs:
     - name: Test Release
       working-directory: ${{runner.workspace}}/build/
       shell: bash
-      run: |
-        ctest -L UnoTest
+      run: ctest -L UnoTest
 
     - name: Create package
       id: package
