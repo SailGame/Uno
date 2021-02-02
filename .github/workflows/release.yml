@@ -68,17 +68,17 @@ jobs:
       shell: bash
       run: |
         ctest -L UnoTest
-        ls
-        pwd
 
     - name: Create package
       id: package
+      working-directory: ${{runner.workspace}}
       run: |
-        pwd
+        mkdir release
+        cp build/uno_server release/
+        cp Uno/README.md release/
+        cp Uno/LICENSE release/
         PACKAGE_NAME=sailgame.uno-provider.${GITHUB_REF#refs/tags/}.${{ matrix.os }}.tar.gz
-        cp README.md build/
-        cp LICENSE build/
-        tar -czvf $PACKAGE_NAME -C build .
+        tar -czvf $PACKAGE_NAME -C release .
         echo ::set-output name=name::${PACKAGE_NAME}
 
     - name: Upload asset
