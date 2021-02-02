@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-20.04]
+        os: [macos-latest, ubuntu-20.04, ubuntu-18.04]
     
     env:
       MY_INSTALL_DIR: ~/.local
@@ -73,10 +73,12 @@ jobs:
       id: package
       working-directory: ${{runner.workspace}}
       run: |
-        cp Uno/README.md build/
-        cp Uno/LICENSE build/
+        mkdir release
+        cp build/uno_server release/
+        cp Uno/README.md release/
+        cp Uno/LICENSE release/
         PACKAGE_NAME=sailgame.uno-provider.${GITHUB_REF#refs/tags/}.${{ matrix.os }}.tar.gz
-        tar -czvf $PACKAGE_NAME -C build .
+        tar -czvf $PACKAGE_NAME -C release .
         echo ::set-output name=name::${PACKAGE_NAME}
 
     - name: Upload asset
