@@ -135,7 +135,7 @@ jobs:
       run: |
         export CMAKE_ROOT=/usr/local/bin
         which cmake
-        cmake --build . 
+        make -j 4
         which cmake
         
     - name: Test
