@@ -135,7 +135,7 @@ jobs:
       run: |
         export CMAKE_ROOT=/usr/local/bin
         which cmake
-        cmake --build . --config ${{ matrix.build_type }} -j 4
+        /usr/local/bin/cmake --build . --config ${{ matrix.build_type }} -j 4
         which cmake
         
     - name: Test
