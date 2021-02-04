@@ -134,9 +134,7 @@ jobs:
       shell: bash
       run: |
         export CMAKE_ROOT=/usr/local/bin
-        which cmake
         make -j 4
-        which cmake
         
     - name: Test
       working-directory: ${{runner.workspace}}/build/
