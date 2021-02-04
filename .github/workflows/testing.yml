@@ -62,7 +62,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ runner.workspace }}/build/lib
-        key: ${{ runner.os }}-build-${{ matrix.build_type }}-${{ hashFiles('lib/**/CMakeLists.txt') }}
+        key: ${{ runner.os }}-build-${{ matrix.build_type }}-${{ hashFiles('lib/**/CMakeLists.txt') }}-3.19.4
 
     - name: Build
       working-directory: ${{runner.workspace}}/build/
