@@ -32,7 +32,7 @@ jobs:
       id: grpc-cache
       with:
         path: ${{env.MY_INSTALL_DIR}}
-        key: ${{ runner.os }}-grpc-${{ env.GRPC_VERSION }}
+        key: ${{ runner.os }}-grpc-${{ env.GRPC_VERSION }}-3.19.4
 
     - name: Set up dependencies
       if: steps.grpc-cache.outputs.cache-hit != 'true'
@@ -133,9 +133,6 @@ jobs:
       working-directory: ${{runner.workspace}}/build/
       shell: bash
       run: |
-        ls /usr/local/Cellar/cmake
-        echo "-----"
-        ls /usr/local/Cellar/cmake/3.19.4
         make -j 4
         
     - name: Test
