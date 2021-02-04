@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - ci-trial
   pull_request:
     branches:
       - main
@@ -113,11 +114,14 @@ jobs:
       working-directory: ${{runner.workspace}}
       run: |
         cmake -E make_directory build
+        which cmake
 
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build/
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_PREFIX_PATH=$MY_INSTALL_DIR
+      run: |
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_PREFIX_PATH=$MY_INSTALL_DIR
+        which cmake
 
     - name: Cache externals
       uses: actions/cache@v2
@@ -128,8 +132,9 @@ jobs:
     - name: Build
       working-directory: ${{runner.workspace}}/build/
       shell: bash
-      run: 
+      run: |
         cmake --build . --config ${{ matrix.build_type }} -j 4
+        which cmake
 
     - name: Test
       working-directory: ${{runner.workspace}}/build/
