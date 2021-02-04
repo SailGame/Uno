@@ -133,7 +133,11 @@ jobs:
       working-directory: ${{runner.workspace}}/build/
       shell: bash
       run: |
-        export CMAKE_ROOT=/usr/local/bin
+        ls /usr/local/Cellar/cmake
+        echo "-----"
+        ls /usr/local/Cellar/cmake/3.19.3
+        echo "-----"
+        ls /usr/local/Cellar/cmake/3.19.4
         make -j 4
         
     - name: Test
