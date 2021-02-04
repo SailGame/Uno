@@ -135,8 +135,8 @@ jobs:
       run: |
         export CMAKE_ROOT=/usr/local/bin
         which cmake
+        cmake --build . 
         which cmake
-        cmake --version
         
     - name: Test
       working-directory: ${{runner.workspace}}/build/
