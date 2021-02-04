@@ -133,9 +133,10 @@ jobs:
       working-directory: ${{runner.workspace}}/build/
       shell: bash
       run: |
-        mkdir -p /usr/local/Cellar/cmake/3.19.3/bin/
-        cp $(which cmake) /usr/local/Cellar/cmake/3.19.3/bin/
+        export CMAKE_ROOT=/usr/local/bin
+        which cmake
         cmake --build . --config ${{ matrix.build_type }} -j 4
+        which cmake
         
     - name: Test
       working-directory: ${{runner.workspace}}/build/
